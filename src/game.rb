@@ -4,6 +4,7 @@
 # The main game engine
 
 require 'gosu'
+require_relative 'level.rb'
 
 class Game < Gosu::Window
   SCALE = 3
@@ -13,6 +14,8 @@ class Game < Gosu::Window
   def initialize
     super WIDTH, HEIGHT, false
     self.caption = "Commander Keen in Revenge of the Shikadi!"
+
+    @level = Level.new(self)
   end
 
   # update the logic of the game
@@ -21,6 +24,7 @@ class Game < Gosu::Window
 
   # draw the components of the game
   def draw
+    @level.draw SCALE
   end
 
   # method called when a button is pressed
