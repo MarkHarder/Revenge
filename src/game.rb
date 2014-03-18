@@ -5,6 +5,7 @@
 
 require 'gosu'
 require_relative 'level.rb'
+require_relative 'player.rb'
 
 class Game < Gosu::Window
   SCALE = 3
@@ -16,6 +17,7 @@ class Game < Gosu::Window
     self.caption = "Commander Keen in Revenge of the Shikadi!"
 
     @level = Level.new(self)
+    @player = Player.new(self)
   end
 
   # update the logic of the game
@@ -25,6 +27,7 @@ class Game < Gosu::Window
   # draw the components of the game
   def draw
     @level.draw SCALE
+    @player.draw SCALE
   end
 
   # method called when a button is pressed
