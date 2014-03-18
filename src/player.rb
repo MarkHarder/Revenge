@@ -7,6 +7,7 @@ class Player
   def initialize window
     @x = 20
     @y = 20
+    @direction = :right
 
     @sprites = Gosu::Image::load_tiles(window, "media/PlayerSprites.png", 32, 32, true)
 
@@ -16,8 +17,10 @@ class Player
   def update
     if @window.button_down? Gosu::KbRight or @window.button_down? Gosu::GpRight
       @x += 1
+      @direction = :right
     elsif @window.button_down? Gosu::KbLeft or @window.button_down? Gosu::GpLeft
       @x -= 1
+      @direction = :left
     end
  
 
@@ -27,7 +30,11 @@ class Player
   # draw the player on the screen
   def draw size
     # get the first image
-    image = @sprites[0]
+    if @direction == :right
+      image = @sprites[0]
+    else
+      image = @sprites[8]
+    end
 
     # upper left corner of player
     px = @x * size - 8 * size
