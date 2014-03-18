@@ -13,6 +13,17 @@ class Player
     @window = window
   end
 
+  def update
+    if @window.button_down? Gosu::KbRight or @window.button_down? Gosu::GpRight
+      @x += 1
+    elsif @window.button_down? Gosu::KbLeft or @window.button_down? Gosu::GpLeft
+      @x -= 1
+    end
+ 
+
+    @y += 1
+  end
+
   # draw the player on the screen
   def draw size
     # get the first image
