@@ -6,8 +6,9 @@
 require 'gosu'
 
 class Game < Gosu::Window
-  WIDTH = 32 * 10
-  HEIGHT = 25 * 10
+  SCALE = 3
+  WIDTH = 32 * 10 * SCALE
+  HEIGHT = 25 * 10 * SCALE
 
   def initialize
     super WIDTH, HEIGHT, false
