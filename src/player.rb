@@ -31,9 +31,17 @@ class Player
   def draw size
     # get the first image
     if @direction == :right
-      image = @sprites[0]
+      if @window.button_down? Gosu::KbRight or @window.button_down? Gosu::GpRight
+        image = @sprites[(Gosu::milliseconds / 120 % 4) + 1]
+      else
+        image = @sprites[0]
+      end
     else
-      image = @sprites[8]
+      if @window.button_down? Gosu::KbLeft or @window.button_down? Gosu::GpLeft
+        image = @sprites[(Gosu::milliseconds / 120 % 4) + 9]
+      else
+        image = @sprites[8]
+      end
     end
 
     # upper left corner of player
