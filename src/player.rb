@@ -8,6 +8,7 @@ require_relative 'rectangle.rb'
 class Player < Rectangle
   WIDTH = 32
   HEIGHT = 32
+  JUMP_TIME = 800
 
   def initialize window
     super(@x, @y, WIDTH, HEIGHT)
@@ -19,9 +20,30 @@ class Player < Rectangle
     @sprites = Gosu::Image::load_tiles(window, "media/PlayerSprites.png", WIDTH, HEIGHT, true)
 
     @window = window
+    @action = :falling
+    @action_start_milliseconds = 0
   end
 
   def update level
+    if @window.button_down? Gosu::KbLeftControl
+      if @action == :none
+        @action = :jumping
+        @action_start_milliseconds = Gosu.milliseconds
+      end
+    elsif @action == :jumping
+      @action = :falling
+    end
+
+    # check to see if the player hits a ceiling while jumping
+    if @action == :jumping
+      right_rect = Rectangle.new(@x, @y - 1, @width, @height)
+      for p in level.platforms do
+        @action = :falling if right_rect.intersect?(p)
+      end
+      @action = :falling if Gosu.milliseconds - @action_start_milliseconds >= JUMP_TIME
+      @y -= 1 if @action == :jumping
+    end
+
     if @window.button_down? Gosu::KbRight or @window.button_down? Gosu::GpRight
       @direction = :right
 
@@ -50,25 +72,29 @@ class Player < Rectangle
  
     # check if there is a platform beneath the player
     # if there is no platform below the player, they fall down
-    can_fall = true
+    @action = :falling if @action == :none
     fall_rect = Rectangle.new(@x, @y + 1, @width, @height)
     for p in level.platforms do
-      can_fall = false if fall_rect.intersect?(p)
+      @action = :none if fall_rect.intersect?(p)
     end
-    @y += 1 if can_fall
+    @y += 1 if @action == :falling
   end
 
   # draw the player on the screen
   def draw size
     # get the first image
     if @direction == :right
-      if @window.button_down? Gosu::KbRight or @window.button_down? Gosu::GpRight
+      if @action == :jumping || @action == :falling
+        image = @sprites[(Gosu::milliseconds / 520 % 2) + 5]
+      elsif @window.button_down? Gosu::KbRight or @window.button_down? Gosu::GpRight
         image = @sprites[(Gosu::milliseconds / 120 % 4) + 1]
       else
         image = @sprites[0]
       end
     else
-      if @window.button_down? Gosu::KbLeft or @window.button_down? Gosu::GpLeft
+      if @action == :jumping || @action == :falling
+      image = @sprites[(Gosu::milliseconds / 520 % 2) + 14]
+      elsif @window.button_down? Gosu::KbLeft or @window.button_down? Gosu::GpLeft
         image = @sprites[(Gosu::milliseconds / 120 % 4) + 9]
       else
         image = @sprites[8]
