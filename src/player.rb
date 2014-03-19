@@ -3,28 +3,59 @@
 # ----------
 # A class to store information about the player
 
-class Player
+require_relative 'rectangle.rb'
+
+class Player < Rectangle
+  WIDTH = 32
+  HEIGHT = 32
+
   def initialize window
+    super(@x, @y, WIDTH, HEIGHT)
+
     @x = 20
     @y = 20
     @direction = :right
 
-    @sprites = Gosu::Image::load_tiles(window, "media/PlayerSprites.png", 32, 32, true)
+    @sprites = Gosu::Image::load_tiles(window, "media/PlayerSprites.png", WIDTH, HEIGHT, true)
 
     @window = window
   end
 
-  def update
+  def update level
     if @window.button_down? Gosu::KbRight or @window.button_down? Gosu::GpRight
-      @x += 1
       @direction = :right
+
+      # check if there is room to move right
+      # create a rectangle just to the right of the player and check
+      #   if it overlaps with any of the platforms
+      can_right = true
+      right_rect = Rectangle.new(@x + 1, @y, @width, @height)
+      for p in level.platforms do
+        can_right = false if right_rect.intersect?(p)
+      end
+      @x += 1 if can_right
     elsif @window.button_down? Gosu::KbLeft or @window.button_down? Gosu::GpLeft
-      @x -= 1
       @direction = :left
+
+      # check if there is room to move left
+      # create a rectangle just to the left of the player and check
+      #   if it overlaps with any of the platforms
+      can_left = true
+      left_rect = Rectangle.new(@x - 1, @y, @width, @height)
+      for p in level.platforms do
+        can_left = false if left_rect.intersect?(p)
+      end
+      @x -= 1 if can_left
     end
  
-
-    @y += 1
+    # check if there is a platform beneath the player
+    # if there is no platform below the player, they fall down
+    can_fall = true
+    fall_rect = Rectangle.new(@x, @y + 1, @width, @height)
+    for p in level.platforms do
+      can_fall = false if fall_rect.intersect?(p)
+    end
+    @y += 1 if can_fall
   end
 
   # draw the player on the screen

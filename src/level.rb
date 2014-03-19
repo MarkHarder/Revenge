@@ -3,7 +3,11 @@
 # ----------
 # A basic level template
 
+require_relative 'rectangle.rb'
+
 class Level
+  attr_reader :platforms
+
   WIDTH = 10
   HEIGHT = 10
 
@@ -25,6 +29,15 @@ class Level
     )
 
     @terrain = Gosu::Image::load_tiles(window, "media/Terrain.png", 32, 50, true)
+    @platforms = []
+
+    # add all the rectangles to check for collision
+    0.upto(WIDTH - 1) do |x|
+      0.upto(HEIGHT - 1) do |y|
+        @platforms.push(Rectangle.new(x * 32, y * 25 - 12, 32, 37)) if @tiles[x + y * WIDTH] == '-'
+      end
+    end
+
     @window = window
   end
 
