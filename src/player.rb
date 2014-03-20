@@ -10,6 +10,7 @@ class Player < Rectangle
   HEIGHT = 32
   JUMP_TIME = 800
   POGO_TIME = 1200
+  BOUNCE_TIME = 200
 
   def initialize window
     super(@x, @y, WIDTH, HEIGHT)
@@ -23,6 +24,7 @@ class Player < Rectangle
     @window = window
     @action = :falling
     @action_start_milliseconds = 0
+    @bounce_start_milliseconds = 0
   end
 
   def update level
@@ -88,6 +90,7 @@ class Player < Rectangle
           @action = :none 
         elsif @action == :pogo_falling
           @action = :pogoing 
+          @bounce_start_milliseconds = Gosu.milliseconds
           @action_start_milliseconds = Gosu.milliseconds
           @action_start_milliseconds += 400 if @window.button_down? Gosu::KbLeftControl
         end
@@ -103,7 +106,11 @@ class Player < Rectangle
       if @action == :jumping || @action == :falling
         image = @sprites[(Gosu::milliseconds / 520 % 2) + 5]
       elsif @action == :pogoing || @action == :pogo_falling
-        image = @sprites[18]
+        if Gosu::milliseconds - @bounce_start_milliseconds >= BOUNCE_TIME
+          image = @sprites[18]
+        else
+          image = @sprites[19]
+        end
       elsif @window.button_down? Gosu::KbRight or @window.button_down? Gosu::GpRight
         image = @sprites[(Gosu::milliseconds / 120 % 4) + 1]
       else
@@ -113,7 +120,11 @@ class Player < Rectangle
       if @action == :jumping || @action == :falling
         image = @sprites[(Gosu::milliseconds / 520 % 2) + 14]
       elsif @action == :pogoing || @action == :pogo_falling
-        image = @sprites[26]
+        if Gosu::milliseconds - @bounce_start_milliseconds >= BOUNCE_TIME
+          image = @sprites[26]
+        else
+          image = @sprites[27]
+        end
       elsif @window.button_down? Gosu::KbLeft or @window.button_down? Gosu::GpLeft
         image = @sprites[(Gosu::milliseconds / 120 % 4) + 9]
       else
@@ -134,6 +145,7 @@ class Player < Rectangle
       @action = :falling
     else
       if @action == :none
+        @bounce_start_milliseconds = Gosu.milliseconds
         @action_start_milliseconds = Gosu.milliseconds
         @action_start_milliseconds += 400 if @window.button_down? Gosu::KbLeftControl
       else
