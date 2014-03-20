@@ -35,6 +35,8 @@ class Game < Gosu::Window
   def button_down(id)
     if id == Gosu::KbEscape || id == Gosu::KbQ
       close
+    elsif id == Gosu::KbLeftAlt
+      @player.toggle_pogo
     end
   end
 

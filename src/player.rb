@@ -9,6 +9,7 @@ class Player < Rectangle
   WIDTH = 32
   HEIGHT = 32
   JUMP_TIME = 800
+  POGO_TIME = 1200
 
   def initialize window
     super(@x, @y, WIDTH, HEIGHT)
@@ -36,12 +37,19 @@ class Player < Rectangle
 
     # check to see if the player hits a ceiling while jumping
     if @action == :jumping
-      right_rect = Rectangle.new(@x, @y - 1, @width, @height)
+      up_rect = Rectangle.new(@x, @y - 1, @width, @height)
       for p in level.platforms do
-        @action = :falling if right_rect.intersect?(p)
+        @action = :falling if up_rect.intersect?(p)
       end
       @action = :falling if Gosu.milliseconds - @action_start_milliseconds >= JUMP_TIME
       @y -= 1 if @action == :jumping
+    elsif @action == :pogoing
+      up_rect = Rectangle.new(@x, @y - 1, @width, @height)
+      for p in level.platforms do
+        @action = :pogo_falling if up_rect.intersect?(p)
+      end
+      @action = :pogo_falling if Gosu.milliseconds - @action_start_milliseconds >= POGO_TIME
+      @y -= 1 unless @action == :pogo_falling
     end
 
     if @window.button_down? Gosu::KbRight or @window.button_down? Gosu::GpRight
@@ -75,9 +83,17 @@ class Player < Rectangle
     @action = :falling if @action == :none
     fall_rect = Rectangle.new(@x, @y + 1, @width, @height)
     for p in level.platforms do
-      @action = :none if fall_rect.intersect?(p)
+      if fall_rect.intersect?(p)
+        if @action == :falling
+          @action = :none 
+        elsif @action == :pogo_falling
+          @action = :pogoing 
+          @action_start_milliseconds = Gosu.milliseconds
+          @action_start_milliseconds += 400 if @window.button_down? Gosu::KbLeftControl
+        end
+      end
     end
-    @y += 1 if @action == :falling
+    @y += 1 if @action == :falling || @action == :pogo_falling
   end
 
   # draw the player on the screen
@@ -86,6 +102,8 @@ class Player < Rectangle
     if @direction == :right
       if @action == :jumping || @action == :falling
         image = @sprites[(Gosu::milliseconds / 520 % 2) + 5]
+      elsif @action == :pogoing || @action == :pogo_falling
+        image = @sprites[18]
       elsif @window.button_down? Gosu::KbRight or @window.button_down? Gosu::GpRight
         image = @sprites[(Gosu::milliseconds / 120 % 4) + 1]
       else
@@ -93,7 +111,9 @@ class Player < Rectangle
       end
     else
       if @action == :jumping || @action == :falling
-      image = @sprites[(Gosu::milliseconds / 520 % 2) + 14]
+        image = @sprites[(Gosu::milliseconds / 520 % 2) + 14]
+      elsif @action == :pogoing || @action == :pogo_falling
+        image = @sprites[26]
       elsif @window.button_down? Gosu::KbLeft or @window.button_down? Gosu::GpLeft
         image = @sprites[(Gosu::milliseconds / 120 % 4) + 9]
       else
@@ -107,5 +127,19 @@ class Player < Rectangle
 
     # draw the image scaled to size
     image.draw(px, py, 0, size, size)
+  end
+
+  def toggle_pogo
+    if @action == :pogoing || @action == :pogo_falling
+      @action = :falling
+    else
+      if @action == :none
+        @action_start_milliseconds = Gosu.milliseconds
+        @action_start_milliseconds += 400 if @window.button_down? Gosu::KbLeftControl
+      else
+        @action_start_milliseconds = -POGO_TIME
+      end
+      @action = :pogoing
+    end
   end
 end
