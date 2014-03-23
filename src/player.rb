@@ -14,7 +14,7 @@ class Player < Rectangle
   BOUNCE_TIME = 200
 
   def initialize window
-    super(@x, @y, WIDTH, HEIGHT)
+    super(@x, @y, WIDTH - 20, HEIGHT - 4)
 
     @x = 20
     @y = 20
@@ -151,7 +151,7 @@ class Player < Rectangle
     end
 
     # upper left corner of player
-    px = @x * size - 8 * size
+    px = @x * size - 8 * size - 8
     py = @y * size - 4 * size
 
     # draw the image scaled to size
