@@ -31,12 +31,13 @@ class Player < Rectangle
 
   def update level
     # If 's' is pressed, shoot
-    if @window.button_down? Gosu::KbS
+    if @window.button_down? Gosu::KbS and @shoot_toggle == :peaceful
       shoot()
       @shoot_toggle = :violent
     end
     if @shoot_toggle == :violent
-      @blast.update @window
+      @blast.update level
+      @shoot_toggle = :peaceful if @blast.finished?
     end
     
     if @window.button_down? Gosu::KbLeftControl
