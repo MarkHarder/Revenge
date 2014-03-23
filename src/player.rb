@@ -3,6 +3,7 @@
 # ----------
 # A class to store information about the player
 
+require_relative 'blast.rb'
 require_relative 'rectangle.rb'
 
 class Player < Rectangle
@@ -25,9 +26,20 @@ class Player < Rectangle
     @action = :falling
     @action_start_milliseconds = 0
     @bounce_start_milliseconds = 0
+    @shoot_toggle = :peaceful
   end
 
   def update level
+    # If 's' is pressed, shoot
+    if @window.button_down? Gosu::KbS and @shoot_toggle == :peaceful
+      shoot()
+      @shoot_toggle = :violent
+    end
+    if @shoot_toggle == :violent
+      @blast.update level
+      @shoot_toggle = :peaceful if @blast.finished?
+    end
+    
     if @window.button_down? Gosu::KbLeftControl
       if @action == :none
         @action = :jumping
@@ -101,6 +113,7 @@ class Player < Rectangle
 
   # draw the player on the screen
   def draw size
+    
     # get the first image
     if @direction == :right
       if @action == :jumping || @action == :falling
@@ -131,6 +144,11 @@ class Player < Rectangle
         image = @sprites[8]
       end
     end
+    
+    #If player is shooting
+    if @shoot_toggle == :violent
+      @blast.draw(size)
+    end
 
     # upper left corner of player
     px = @x * size - 8 * size
@@ -138,6 +156,12 @@ class Player < Rectangle
 
     # draw the image scaled to size
     image.draw(px, py, 0, size, size)
+  end
+  
+  def shoot
+    #Replace 3 with SCALE value
+    @blast = Blast.new(@window, @direction, @x*3, @y*3, WIDTH)
+    return @sprites[(Gosu::milliseconds / 120 % 2) + 17]
   end
 
   def toggle_pogo
