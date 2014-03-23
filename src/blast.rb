@@ -52,10 +52,8 @@ class Blast < Rectangle
       # Collisions with platforms still not working
       if @direction == :right
         can_right = true
-        right_rect = Rectangle.new(@x + WIDTH, @y, WIDTH, HEIGHT)
-        for p in level.platforms do
-          can_right = false if right_rect.intersect?(p)
-        end
+        right_rect = Rectangle.new(@x, @y, @width, @height)
+        level.platforms.each {|p| can_right = false if right_rect.intersect?(p)}
         can_right = false if @x > @window.width-(WIDTH+SPEED)
         if !can_right
           @state = :collision
@@ -68,10 +66,8 @@ class Blast < Rectangle
       # if it intersects with any of the platforms, collision
       if @direction == :left
         can_left = true
-        left_rect = Rectangle.new(@x - WIDTH, @y, WIDTH, HEIGHT)
-        for p in level.platforms do
-          can_left = false if left_rect.intersect?(p)
-        end
+        left_rect = Rectangle.new(@x, @y, @width, @height)
+        level.platforms.each {|p| can_left = false if left_rect.intersect?(p)}
         can_left = false if @x <= 0
         if !can_left
           @state = :collision
