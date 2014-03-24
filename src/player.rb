@@ -64,6 +64,13 @@ class Player < Rectangle
       end
       @action = :pogo_falling if Gosu.milliseconds - @action_start_milliseconds >= POGO_TIME
       @y -= 1 unless @action == :pogo_falling
+    elsif @action == :pogo_jumping
+      up_rect = Rectangle.new(@x, @y - 1, @width, @height)
+      for p in level.platforms do
+        @action = :falling if up_rect.intersect?(p)
+      end
+      @action = :falling if Gosu.milliseconds - @action_start_milliseconds >= POGO_TIME
+      @y -= 1 unless @action == :falling
     end
 
     if @window.button_down? Gosu::KbRight or @window.button_down? Gosu::GpRight
@@ -113,10 +120,9 @@ class Player < Rectangle
 
   # draw the player on the screen
   def draw size
-    
     # get the first image
     if @direction == :right
-      if @action == :jumping || @action == :falling
+      if @action == :jumping || @action == :falling || @action == :pogo_jumping
         image = @sprites[(Gosu::milliseconds / 520 % 2) + 5]
       elsif @action == :pogoing || @action == :pogo_falling
         if Gosu::milliseconds - @bounce_start_milliseconds >= BOUNCE_TIME
@@ -130,7 +136,7 @@ class Player < Rectangle
         image = @sprites[0]
       end
     else
-      if @action == :jumping || @action == :falling
+      if @action == :jumping || @action == :falling || @action == :pogo_jumping
         image = @sprites[(Gosu::milliseconds / 520 % 2) + 14]
       elsif @action == :pogoing || @action == :pogo_falling
         if Gosu::milliseconds - @bounce_start_milliseconds >= BOUNCE_TIME
@@ -165,8 +171,12 @@ class Player < Rectangle
   end
 
   def toggle_pogo
-    if @action == :pogoing || @action == :pogo_falling
+    if @action == :pogo_falling
       @action = :falling
+    elsif @action == :pogoing
+      @action = :pogo_jumping
+    elsif @action == :pogo_jumping
+      @action = :pogoing
     else
       if @action == :none
         @bounce_start_milliseconds = Gosu.milliseconds
