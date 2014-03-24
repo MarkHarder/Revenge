@@ -3,7 +3,7 @@
 # ----------
 # A basic level template
 
-require_relative 'enemy.rb'
+require_relative 'slug.rb'
 require_relative 'rectangle.rb'
 
 class Level
@@ -14,7 +14,6 @@ class Level
 
   def initialize window
     @terrain = Gosu::Image::load_tiles(window, "media/Terrain.png", 32, 50, true)
-    @slug = Gosu::Image::load_tiles(window, "media/SlugSprites.png", 23, 24, true)
     @enemies = []
 
     # a grid representing the tiles of the level
@@ -25,8 +24,8 @@ class Level
       if line_no == 0
         @tiles = line.split(/\s/)
       else
-        x, y, width, height, type = line.split(/\s/)
-        @enemies.push(Enemy.new(x.to_i, y.to_i, width.to_i, height.to_i, @slug))
+        x, y, type = line.split(/\s/)
+        @enemies.push(Slug.new(window, x.to_i, y.to_i))
       end
       line_no += 1
     end

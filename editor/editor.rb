@@ -5,7 +5,7 @@
 
 require 'gosu'
 
-require_relative '../src/enemy.rb'
+require_relative '../src/slug.rb'
 
 class Editor < Gosu::Window
   SCALE = 3
@@ -23,14 +23,13 @@ class Editor < Gosu::Window
     0.upto(99) { @tiles.push(:none) }
 
     @terrain = Gosu::Image::load_tiles(self, "media/Terrain.png", 32, 50, true)
-    @slug = Gosu::Image::load_tiles(self, "media/SlugSprites.png", 23, 24, true)
 
     @images = {
       :platform => @terrain[0],
       :background => @terrain[1],
       :none => @terrain[2],
 
-      :slug => @slug[0],
+      :slug => Slug.new(self, 0, 0).images[0],
     }
 
     @current_selection = :background
@@ -111,7 +110,7 @@ class Editor < Gosu::Window
         y = (mouse_y / SCALE).to_i
         y -= y % 25
         y -= 12
-        @enemies.push(Enemy.new(x, y, 16, 16, @slug))
+        @enemies.push(Slug.new(self, x, y))
       end
     end
   end
@@ -138,7 +137,7 @@ class Editor < Gosu::Window
         end
       end
       for enemy in @enemies do
-        str += "\n#{enemy.x} #{enemy.y} #{enemy.width} #{enemy.height} slug"
+        str += "\n#{enemy.x} #{enemy.y} slug"
       end
       file.write(str);
     end
