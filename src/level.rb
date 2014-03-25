@@ -41,6 +41,12 @@ class Level
     @window = window
   end
 
+  def update
+    for enemy in @enemies do
+      enemy.update self
+    end
+  end
+
   # draw the level on the screen
   # draw the background and platforms
   def draw size

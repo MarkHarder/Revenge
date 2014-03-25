@@ -23,6 +23,7 @@ class Game < Gosu::Window
   # update the logic of the game
   def update
     @player.update @level
+    @level.update
   end
 
   # draw the components of the game
