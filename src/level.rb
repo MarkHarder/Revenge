@@ -4,6 +4,7 @@
 # A basic level template
 
 require_relative 'slug.rb'
+require_relative 'spikes.rb'
 require_relative 'rectangle.rb'
 
 class Level
@@ -25,7 +26,7 @@ class Level
         @tiles = line.split(/\s/)
       else
         x, y, type = line.split(/\s/)
-        @enemies.push(Slug.new(window, x.to_i, y.to_i))
+        @enemies.push(Object.const_get(type).new(window, x.to_i, y.to_i))
       end
       line_no += 1
     end

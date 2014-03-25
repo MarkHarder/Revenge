@@ -12,7 +12,7 @@ class Enemy < Rectangle
     @harmless = false
   end
 
-  def update
+  def update level
   end
 
   def draw size

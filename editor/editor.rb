@@ -6,6 +6,7 @@
 require 'gosu'
 
 require_relative '../src/slug.rb'
+require_relative '../src/spikes.rb'
 
 class Editor < Gosu::Window
   SCALE = 3
@@ -30,6 +31,7 @@ class Editor < Gosu::Window
       :none => @terrain[2],
 
       :slug => Slug.new(self, 0, 0).images[0],
+      :spikes => Spikes.new(self, 0, 0).images[0],
     }
 
     @current_selection = :background
@@ -103,6 +105,8 @@ class Editor < Gosu::Window
       @current_selection = :platform
     elsif id == Gosu::Kb3
       @current_selection = :slug
+    elsif id == Gosu::Kb4
+      @current_selection = :spikes
     elsif id == Gosu::MsLeft
       if @current_selection == :slug
         x = (mouse_x / SCALE).to_i
@@ -111,6 +115,14 @@ class Editor < Gosu::Window
         y -= y % 25
         y -= 12
         @enemies.push(Slug.new(self, x, y))
+      elsif @current_selection == :spikes
+        x = (mouse_x / SCALE).to_i
+        x -= x % 32
+        x += 3
+        y = (mouse_y / SCALE).to_i
+        y -= y % 25
+        y -= 12
+        @enemies.push(Spikes.new(self, x, y))
       end
     end
   end
@@ -137,7 +149,7 @@ class Editor < Gosu::Window
         end
       end
       for enemy in @enemies do
-        str += "\n#{enemy.x} #{enemy.y} slug"
+        str += "\n#{enemy.x} #{enemy.y} #{enemy.class}"
       end
       file.write(str);
     end
