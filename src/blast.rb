@@ -16,7 +16,6 @@ class Blast < Rectangle
     super(x, y, WIDTH, HEIGHT)
     @window = window
     @direction = direction
-    
     @sprites = Gosu::Image::load_tiles(@window, 'media/blast.png', WIDTH, HEIGHT, true)
     
     if direction == :left
@@ -26,6 +25,8 @@ class Blast < Rectangle
     end
     @y = y
     
+    @collisionWith = :none
+    
     #Possible states:
     ## :Initial - First couple frames of animation
     ## :Moving - While blast is moving through the air
@@ -33,6 +34,10 @@ class Blast < Rectangle
     ## :Finished - After blast has finished exploding
     @state = :initial
     @start_milliseconds = 0
+  end
+  
+  def collisionWith
+    @collisionWith
   end
   
   def update level
@@ -54,8 +59,16 @@ class Blast < Rectangle
       if @direction == :right
         can_right = true
         right_rect = Rectangle.new(@x/SCALE, @y/SCALE, @width, @height)
+        #check platforms for collision
         level.platforms.each {|p| can_right = false if right_rect.intersect?(p)}
-        level.enemies.each {|e| can_right = false if right_rect.intersect?(e)}
+        #check enemies for collision
+        level.enemies.each do |e|
+          if right_rect.intersect?(e)
+            can_right = false
+            #Recognize Enemy Types
+            level.enemies.delete(e)
+          end
+        end
         can_right = false if @x > @window.width-(WIDTH+SPEED)
         if !can_right
           @state = :collision
@@ -69,8 +82,16 @@ class Blast < Rectangle
       if @direction == :left
         can_left = true
         left_rect = Rectangle.new(@x/SCALE, @y/SCALE, @width, @height)
-        level.platforms.each {|p| can_left = false if left_rect.intersect?(p)}
-        level.enemies.each {|e| can_left = false if left_rect.intersect?(e)}
+        #check platforms for collision
+        level.platforms.each {|p| can_left = false if right_rect.intersect?(p)}
+        #check enemies for collision
+        level.enemies.each do |e|
+          if left_rect.intersect?(e)
+            can_left = false
+            #Recognize Enemy Types
+            level.enemies.delete(p)
+          end
+        end
         can_left = false if @x <= 0
         if !can_left
           @state = :collision

@@ -27,7 +27,7 @@ class Player < Rectangle
     @action = :falling
     @action_start_milliseconds = 0
     @bounce_start_milliseconds = 0
-    #@shoot_state: 0=nothing, >1=first shoot frame, >5=second shoot frame, >5nothing
+    #@shoot_state: 0=nothing, >1=first shoot frame, >5=second shoot frame, >5 nothing
     @shoot_state = 0
     @shoot_toggle = :peaceful
   end
@@ -48,7 +48,8 @@ class Player < Rectangle
       @y += 1 if elapsed_time >= DEATH_TIME / 6
       return
     end
-
+    
+    # ~shooting
     # If 's' is pressed, shoot
     if @window.button_down? Gosu::KbS and @shoot_toggle == :peaceful
       @shoot_state = 1
@@ -182,34 +183,35 @@ class Player < Rectangle
       end
     end
     
+    # ~shooting
     #If player is shooting
     if (@shoot_toggle == :violent and @direction == :right)
-      if @shoot_state == 0
+      case @shoot_state
+      when 0
         image = @sprites[16]
         @shoot_state += 1
-      elsif (@shoot_state > 0 and @shoot_state < 5)
+      when 1..5
         image = @sprites[16]
         @shoot_state += 1
-      elsif (@shoot_state >= 10 and @shoot_state < 10)
+      when 6..10
         image = @sprites[17]
         @shoot_state += 1
-      elsif @shoot_state >= 20
       end
       @blast.draw(size)
     elsif @shoot_toggle == :peaceful
       @shoot_state = 0
     end
     if (@shoot_toggle == :violent and @direction == :left)
-      if @shoot_state == 0
+      case @shoot_state
+      when 0
         image = @sprites[24]
         @shoot_state += 1
-      elsif (@shoot_state > 0 and @shoot_state < 5)
+      when 1..5
         image = @sprites[24]
         @shoot_state += 1
-      elsif (@shoot_state >= 10 and @shoot_state < 10)
+      when 6..10
         image = @sprites[25]
         @shoot_state += 1
-      elsif @shoot_state >= 20
       end
       @blast.draw(size)
     elsif @shoot_toggle == :peaceful
