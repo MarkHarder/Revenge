@@ -27,6 +27,8 @@ class Player < Rectangle
     @action = :falling
     @action_start_milliseconds = 0
     @bounce_start_milliseconds = 0
+    #@shoot_state: 0=nothing, >1=first shoot frame, >10=second shoot frame, >10=nothing
+    @shoot_state = 0
     @shoot_toggle = :peaceful
   end
 
@@ -49,6 +51,8 @@ class Player < Rectangle
 
     # If 's' is pressed, shoot
     if @window.button_down? Gosu::KbS and @shoot_toggle == :peaceful
+      puts "IN"
+      @shoot_state = 1
       shoot()
       @shoot_toggle = :violent
     end
@@ -180,9 +184,39 @@ class Player < Rectangle
     end
     
     #If player is shooting
-    if @shoot_toggle == :violent
+    if (@shoot_toggle == :violent and @direction == :right)
+      if @shoot_state == 0
+        image = @sprites[16]
+        @shoot_state += 1
+      elsif (@shoot_state > 0 and @shoot_state < 10)
+        image = @sprites[16]
+        @shoot_state += 1
+      elsif (@shoot_state >= 10 and @shoot_state < 20)
+        image = @sprites[17]
+        @shoot_state += 1
+      elsif @shoot_state >= 20
+      end
       @blast.draw(size)
+    elsif @shoot_toggle == :peaceful
+      @shoot_state = 0
     end
+    if (@shoot_toggle == :violent and @direction == :left)
+      if @shoot_state == 0
+        image = @sprites[24]
+        @shoot_state += 1
+      elsif (@shoot_state > 0 and @shoot_state < 10)
+        image = @sprites[24]
+        @shoot_state += 1
+      elsif (@shoot_state >= 10 and @shoot_state < 20)
+        image = @sprites[25]
+        @shoot_state += 1
+      elsif @shoot_state >= 20
+      end
+      @blast.draw(size)
+    elsif @shoot_toggle == :peaceful
+      @shoot_state = 0
+    end
+    
 
     # upper left corner of player
     px = @x * size - 8 * size - 8
@@ -195,7 +229,6 @@ class Player < Rectangle
   def shoot
     #Replace 3 with SCALE value
     @blast = Blast.new(@window, @direction, @x*3, @y*3, WIDTH)
-    return @sprites[(Gosu::milliseconds / 120 % 2) + 17]
   end
 
   def toggle_pogo
