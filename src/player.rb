@@ -12,6 +12,7 @@ class Player < Rectangle
   JUMP_TIME = 800
   POGO_TIME = 1200
   BOUNCE_TIME = 200
+  DEATH_TIME = 1200
 
   def initialize window
     super(@x, @y, WIDTH - 20, HEIGHT - 4)
@@ -30,6 +31,19 @@ class Player < Rectangle
   end
 
   def update level
+    # die if you touch an enemy
+    for enemy in level.enemies do
+      die if intersect?(enemy) && @action != :dying
+    end
+
+    if @action == :dying
+      elapsed_time = Gosu.milliseconds - @action_start_milliseconds
+      level.quit if elapsed_time >= DEATH_TIME
+      @y -= 1 if elapsed_time < DEATH_TIME / 4
+      @y += 1 if elapsed_time >= DEATH_TIME / 4
+      return
+    end
+
     # If 's' is pressed, shoot
     if @window.button_down? Gosu::KbS and @shoot_toggle == :peaceful
       shoot()
@@ -120,6 +134,17 @@ class Player < Rectangle
 
   # draw the player on the screen
   def draw size
+    if @action == :dying
+      # upper left corner of player
+      px = @x * size - 8 * size - 8
+      py = @y * size - 4 * size
+
+      # draw the image scaled to size
+      image = @sprites[(Gosu::milliseconds / 520 % 2) + 32]
+      image.draw(px, py, 0, size, size)
+      return
+    end
+
     # get the first image
     if @direction == :right
       if @action == :jumping || @action == :falling || @action == :pogo_jumping
@@ -132,7 +157,7 @@ class Player < Rectangle
         end
       elsif @window.button_down? Gosu::KbRight or @window.button_down? Gosu::GpRight
         image = @sprites[(Gosu::milliseconds / 120 % 4) + 1]
-      else
+      elsif @action == :none
         image = @sprites[0]
       end
     else
@@ -146,7 +171,7 @@ class Player < Rectangle
         end
       elsif @window.button_down? Gosu::KbLeft or @window.button_down? Gosu::GpLeft
         image = @sprites[(Gosu::milliseconds / 120 % 4) + 9]
-      else
+      elsif @action == :none
         image = @sprites[8]
       end
     end
@@ -177,7 +202,7 @@ class Player < Rectangle
       @action = :pogo_jumping
     elsif @action == :pogo_jumping
       @action = :pogoing
-    else
+    elsif @action == :none || @action == :falling || @action == :jumping
       if @action == :none
         @bounce_start_milliseconds = Gosu.milliseconds
         @action_start_milliseconds = Gosu.milliseconds
@@ -187,5 +212,10 @@ class Player < Rectangle
       end
       @action = :pogoing
     end
+  end
+
+  def die
+    @action = :dying
+    @action_start_milliseconds = Gosu.milliseconds
   end
 end

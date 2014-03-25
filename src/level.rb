@@ -7,7 +7,7 @@ require_relative 'slug.rb'
 require_relative 'rectangle.rb'
 
 class Level
-  attr_reader :platforms
+  attr_reader :platforms, :enemies
 
   WIDTH = 10
   HEIGHT = 10
@@ -83,5 +83,9 @@ class Level
     for enemy in @enemies
       enemy.draw size
     end
+  end
+
+  def quit
+    exit
   end
 end
