@@ -19,9 +19,25 @@ class Editor < Gosu::Window
     super WIDTH, HEIGHT, false
     self.caption = "Level Editor"
     @enemies = []
-    @tiles = []
 
-    0.upto(99) { @tiles.push(:none) }
+    line_no = 0
+    File.readlines("levels/test.lvl").each do |line|
+      if line_no == 0
+        @tiles = line.split(/\s/)
+      else
+        x, y, type = line.split(/\s/)
+        @enemies.push(Object.const_get(type).new(self, x.to_i, y.to_i))
+      end
+      line_no += 1
+    end
+
+    @swap = {
+      "x" => :none,
+      "." => :background,
+      "-" => :platform,
+    }
+
+    @tiles.collect! { |t| @swap[t] }
 
     @terrain = Gosu::Image::load_tiles(self, "media/Terrain.png", 32, 50, true)
 
