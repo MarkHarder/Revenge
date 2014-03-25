@@ -53,7 +53,7 @@ class Blast < Rectangle
       if @direction == :right
         can_right = true
         right_rect = Rectangle.new(@x, @y, @width, @height)
-        level.platforms.each {|p| can_right = false if right_rect.intersect?(p)}
+        level.enemies.each {|p| can_right = false if right_rect.intersect?(p)}
         can_right = false if @x > @window.width-(WIDTH+SPEED)
         if !can_right
           @state = :collision
@@ -89,12 +89,15 @@ class Blast < Rectangle
       @state = :moving
     elsif @state == :moving
       # Does animating this way cycle through the sprites from a random starting place?
-      @image = @sprites[(Gosu::milliseconds / 60 % 4) + 1]
+        @image = @sprites[(Gosu::milliseconds / 60 % 4) + 1] if @direction == :right
+        @image = @sprites[(Gosu::milliseconds / 60 % 4) + 9] if @direction == :left
     elsif @state == :collision
-      @image = @sprites[(Gosu::milliseconds / 120 % 3 + 5)]
+      @image = @sprites[(Gosu::milliseconds / 120 % 3 + 5)] if @direction == :right
+      @image = @sprites[(Gosu::milliseconds / 120 % 3 + 13)] if @direction == :left
     else
       #state == :finished
-      @image = @sprites[0]
+      @image = @sprites[0] if @direction == :right
+      @image = @sprites[8] if @direction == :left
     end
     @image.draw(@x, @y, 4, size, size)
   end
