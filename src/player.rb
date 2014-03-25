@@ -36,6 +36,9 @@ class Player < Rectangle
       die if intersect?(enemy) && @action != :dying
     end
 
+    #check if the player falls off the map
+    die if level.below_screen(@y + @height) && @action != :dying
+
     if @action == :dying
       elapsed_time = Gosu.milliseconds - @action_start_milliseconds
       level.quit if elapsed_time >= DEATH_TIME

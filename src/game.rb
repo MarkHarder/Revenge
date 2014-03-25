@@ -9,11 +9,11 @@ require_relative 'player.rb'
 
 class Game < Gosu::Window
   SCALE = 3
-  WIDTH = 32 * 10 * SCALE
-  HEIGHT = 25 * 10 * SCALE
+  WIDTH = 32 * 10
+  HEIGHT = 25 * 10
 
   def initialize
-    super WIDTH, HEIGHT, false
+    super WIDTH * SCALE, HEIGHT * SCALE, false
     self.caption = "Commander Keen in Revenge of the Shikadi!"
 
     @level = Level.new(self)

@@ -88,4 +88,8 @@ class Level
   def quit
     exit
   end
+
+  def below_screen y
+    y >= @window.height / 3
+  end
 end
