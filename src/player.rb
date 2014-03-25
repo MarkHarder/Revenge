@@ -13,6 +13,8 @@ class Player < Rectangle
   POGO_TIME = 1200
   BOUNCE_TIME = 200
   DEATH_TIME = 2400
+  PULLUP_TIME = 400
+  HANG_TIME = 1000
 
   def initialize window
     super(@x, @y, WIDTH - 20, HEIGHT - 4)
@@ -20,8 +22,10 @@ class Player < Rectangle
     @x = 20
     @y = 20
     @direction = :right
+    @hang_direction = :none
 
     @sprites = Gosu::Image::load_tiles(window, "media/PlayerSprites.png", WIDTH, HEIGHT, true)
+    @pullup = Gosu::Image::load_tiles(window, "media/Pullup.png", 25, 80, true)
 
     @window = window
     @action = :falling
@@ -47,6 +51,17 @@ class Player < Rectangle
       @y -= 1 if elapsed_time < DEATH_TIME / 6
       @y += 1 if elapsed_time >= DEATH_TIME / 6
       return
+    elsif @action == :pullup
+      if Gosu.milliseconds - @action_start_milliseconds >= PULLUP_TIME * 4
+        @action = :none
+        if @direction == :left
+          @x -= (@width + 5)
+          @y -= (@height)
+        else
+          @x += (@width + 5)
+          @y -= (@height)
+        end
+      end
     end
 
     # If 's' is pressed, shoot
@@ -95,8 +110,6 @@ class Player < Rectangle
     end
 
     if @window.button_down? Gosu::KbRight or @window.button_down? Gosu::GpRight
-      @direction = :right
-
       # check if there is room to move right
       # create a rectangle just to the right of the player and check
       #   if it overlaps with any of the platforms
@@ -106,9 +119,32 @@ class Player < Rectangle
         can_right = false if right_rect.intersect?(p)
       end
       @x += 1 if can_right
-    elsif @window.button_down? Gosu::KbLeft or @window.button_down? Gosu::GpLeft
-      @direction = :left
 
+
+      if @action == :falling || @action == :jumping
+        # grab onto a ledge if it is there
+        pullup = false
+        grab_rect = Rectangle.new(@x + @width, @y, 5, 5)
+        for p in level.platforms do
+          ledge_rect = Rectangle.new(p.x - 2, p.y - 2, 5, 5)
+          pullup = true if ledge_rect.intersect?(grab_rect)
+        end
+        if pullup
+          @hang_direction = :right
+          @action = :hang
+          @action_start_milliseconds = Gosu.milliseconds
+        end
+      elsif @action == :hang 
+        if @hang_direction == :right && Gosu.milliseconds - @action_start_milliseconds >= HANG_TIME
+          @action = :pullup
+          @action_start_milliseconds = Gosu.milliseconds
+        elsif @hang_direction == :left
+          @action = :falling
+        end
+      end
+
+      @direction = :right
+    elsif @window.button_down? Gosu::KbLeft or @window.button_down? Gosu::GpLeft
       # check if there is room to move left
       # create a rectangle just to the left of the player and check
       #   if it overlaps with any of the platforms
@@ -118,6 +154,30 @@ class Player < Rectangle
         can_left = false if left_rect.intersect?(p)
       end
       @x -= 1 if can_left
+
+      # grab onto a ledge if it is there
+      if @action == :falling || @action == :jumping
+        pullup = false
+        grab_rect = Rectangle.new(@x - 5, @y, 5, 5)
+        for p in level.platforms do
+          ledge_rect = Rectangle.new(p.x + p.width - 3, p.y - 2, 5, 5)
+          pullup = true if ledge_rect.intersect?(grab_rect)
+        end
+        if pullup
+          @hang_direction = :left
+          @action = :hang
+          @action_start_milliseconds = Gosu.milliseconds
+        end
+      elsif @action == :hang
+        if @hang_direction == :left && Gosu.milliseconds - @action_start_milliseconds >= HANG_TIME
+          @action = :pullup
+          @action_start_milliseconds = Gosu.milliseconds
+        elsif @hang_direction == :right
+          @action = :falling
+        end
+      end
+
+      @direction = :left
     end
  
     # check if there is a platform beneath the player
@@ -141,11 +201,11 @@ class Player < Rectangle
 
   # draw the player on the screen
   def draw size
-    if @action == :dying
-      # upper left corner of player
-      px = @x * size - 8 * size - 8
-      py = @y * size - 4 * size
+    # upper left corner of player
+    px = @x * size - 8 * size - 8
+    py = @y * size - 4 * size
 
+    if @action == :dying
       # draw the image scaled to size
       image = @sprites[(Gosu::milliseconds / 520 % 2) + 32]
       image.draw(px, py, 0, size, size)
@@ -162,10 +222,26 @@ class Player < Rectangle
         else
           image = @sprites[19]
         end
-      elsif @window.button_down? Gosu::KbRight or @window.button_down? Gosu::GpRight
+      elsif (@window.button_down?(Gosu::KbRight) || @window.button_down?(Gosu::GpRight)) && @action == :none
         image = @sprites[(Gosu::milliseconds / 120 % 4) + 1]
       elsif @action == :none
         image = @sprites[0]
+      elsif @action == :hang
+        px += 20
+        py -= 60
+        image = @pullup[5]
+      elsif @action == :pullup
+        px += 30
+        py -= 60
+        if Gosu.milliseconds - @action_start_milliseconds >= PULLUP_TIME * 3
+          image = @pullup[9]
+        elsif Gosu.milliseconds - @action_start_milliseconds >= PULLUP_TIME * 2
+          image = @pullup[8]
+        elsif Gosu.milliseconds - @action_start_milliseconds >= PULLUP_TIME * 1
+          image = @pullup[7]
+        else
+          image = @pullup[6]
+        end
       end
     else
       if @action == :jumping || @action == :falling || @action == :pogo_jumping
@@ -176,10 +252,26 @@ class Player < Rectangle
         else
           image = @sprites[27]
         end
-      elsif @window.button_down? Gosu::KbLeft or @window.button_down? Gosu::GpLeft
+      elsif (@window.button_down?(Gosu::KbLeft) || @window.button_down?(Gosu::GpLeft)) && @action == :none
         image = @sprites[(Gosu::milliseconds / 120 % 4) + 9]
       elsif @action == :none
         image = @sprites[8]
+      elsif @action == :hang
+        px += 10
+        py -= 60
+        image = @pullup[0]
+      elsif @action == :pullup
+        px -= 20
+        py -= 60
+        if Gosu.milliseconds - @action_start_milliseconds >= PULLUP_TIME * 3
+          image = @pullup[4]
+        elsif Gosu.milliseconds - @action_start_milliseconds >= PULLUP_TIME * 2
+          image = @pullup[3]
+        elsif Gosu.milliseconds - @action_start_milliseconds >= PULLUP_TIME * 1
+          image = @pullup[2]
+        else
+          image = @pullup[1]
+        end
       end
     end
     
@@ -216,11 +308,6 @@ class Player < Rectangle
     elsif @shoot_toggle == :peaceful
       @shoot_state = 0
     end
-    
-
-    # upper left corner of player
-    px = @x * size - 8 * size - 8
-    py = @y * size - 4 * size
 
     # draw the image scaled to size
     image.draw(px, py, 0, size, size)
