@@ -56,10 +56,10 @@ class Player < Rectangle
         @action = :none
         if @direction == :left
           @x -= (@width + 5)
-          @y -= (@height)
+          @y -= (@height + 1)
         else
           @x += (@width + 5)
-          @y -= (@height)
+          @y -= (@height + 1)
         end
       end
     end
@@ -127,7 +127,10 @@ class Player < Rectangle
         grab_rect = Rectangle.new(@x + @width, @y, 5, 5)
         for p in level.platforms do
           ledge_rect = Rectangle.new(p.x - 2, p.y - 2, 5, 5)
-          pullup = true if ledge_rect.intersect?(grab_rect)
+          if ledge_rect.intersect?(grab_rect)
+            pullup = true
+            @y = p.y
+          end
         end
         if pullup
           @hang_direction = :right
@@ -161,7 +164,10 @@ class Player < Rectangle
         grab_rect = Rectangle.new(@x - 5, @y, 5, 5)
         for p in level.platforms do
           ledge_rect = Rectangle.new(p.x + p.width - 3, p.y - 2, 5, 5)
-          pullup = true if ledge_rect.intersect?(grab_rect)
+          if ledge_rect.intersect?(grab_rect)
+            pullup = true
+            @y = p.y
+          end
         end
         if pullup
           @hang_direction = :left
@@ -232,7 +238,7 @@ class Player < Rectangle
         image = @pullup[5]
       elsif @action == :pullup
         px += 30
-        py -= 60
+        py -= 80
         if Gosu.milliseconds - @action_start_milliseconds >= PULLUP_TIME * 3
           image = @pullup[9]
         elsif Gosu.milliseconds - @action_start_milliseconds >= PULLUP_TIME * 2
@@ -262,7 +268,7 @@ class Player < Rectangle
         image = @pullup[0]
       elsif @action == :pullup
         px -= 20
-        py -= 60
+        py -= 80
         if Gosu.milliseconds - @action_start_milliseconds >= PULLUP_TIME * 3
           image = @pullup[4]
         elsif Gosu.milliseconds - @action_start_milliseconds >= PULLUP_TIME * 2
