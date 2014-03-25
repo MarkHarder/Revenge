@@ -33,7 +33,7 @@ class Player < Rectangle
   def update level
     # die if you touch an enemy
     for enemy in level.enemies do
-      die if intersect?(enemy) && @action != :dying
+      die if intersect?(enemy) && !enemy.harmless? && @action != :dying
     end
 
     #check if the player falls off the map
