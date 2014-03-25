@@ -9,6 +9,7 @@ class Blast < Rectangle
   WIDTH = 14
   HEIGHT = 16
   SPEED = 10
+  SCALE = 3
   EXPLOSION_TIME = 240
   
   def initialize(window, direction, x, y, offset)
@@ -52,8 +53,9 @@ class Blast < Rectangle
       # Collisions with platforms still not working
       if @direction == :right
         can_right = true
-        right_rect = Rectangle.new(@x, @y, @width, @height)
-        level.enemies.each {|p| can_right = false if right_rect.intersect?(p)}
+        right_rect = Rectangle.new(@x/SCALE, @y/SCALE, @width, @height)
+        level.platforms.each {|p| can_right = false if right_rect.intersect?(p)}
+        level.enemies.each {|e| can_right = false if right_rect.intersect?(e)}
         can_right = false if @x > @window.width-(WIDTH+SPEED)
         if !can_right
           @state = :collision
@@ -66,8 +68,9 @@ class Blast < Rectangle
       # if it intersects with any of the platforms, collision
       if @direction == :left
         can_left = true
-        left_rect = Rectangle.new(@x, @y, @width, @height)
+        left_rect = Rectangle.new(@x/SCALE, @y/SCALE, @width, @height)
         level.platforms.each {|p| can_left = false if left_rect.intersect?(p)}
+        level.enemies.each {|e| can_left = false if left_rect.intersect?(e)}
         can_left = false if @x <= 0
         if !can_left
           @state = :collision
