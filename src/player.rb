@@ -27,7 +27,7 @@ class Player < Rectangle
     @action = :falling
     @action_start_milliseconds = 0
     @bounce_start_milliseconds = 0
-    #@shoot_state: 0=nothing, >1=first shoot frame, >10=second shoot frame, >10=nothing
+    #@shoot_state: 0=nothing, >1=first shoot frame, >5=second shoot frame, >5nothing
     @shoot_state = 0
     @shoot_toggle = :peaceful
   end
@@ -51,7 +51,6 @@ class Player < Rectangle
 
     # If 's' is pressed, shoot
     if @window.button_down? Gosu::KbS and @shoot_toggle == :peaceful
-      puts "IN"
       @shoot_state = 1
       shoot()
       @shoot_toggle = :violent
@@ -188,10 +187,10 @@ class Player < Rectangle
       if @shoot_state == 0
         image = @sprites[16]
         @shoot_state += 1
-      elsif (@shoot_state > 0 and @shoot_state < 10)
+      elsif (@shoot_state > 0 and @shoot_state < 5)
         image = @sprites[16]
         @shoot_state += 1
-      elsif (@shoot_state >= 10 and @shoot_state < 20)
+      elsif (@shoot_state >= 10 and @shoot_state < 10)
         image = @sprites[17]
         @shoot_state += 1
       elsif @shoot_state >= 20
@@ -204,10 +203,10 @@ class Player < Rectangle
       if @shoot_state == 0
         image = @sprites[24]
         @shoot_state += 1
-      elsif (@shoot_state > 0 and @shoot_state < 10)
+      elsif (@shoot_state > 0 and @shoot_state < 5)
         image = @sprites[24]
         @shoot_state += 1
-      elsif (@shoot_state >= 10 and @shoot_state < 20)
+      elsif (@shoot_state >= 10 and @shoot_state < 10)
         image = @sprites[25]
         @shoot_state += 1
       elsif @shoot_state >= 20
