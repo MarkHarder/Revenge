@@ -12,7 +12,7 @@ class Player < Rectangle
   JUMP_TIME = 800
   POGO_TIME = 1200
   BOUNCE_TIME = 200
-  DEATH_TIME = 1200
+  DEATH_TIME = 2400
 
   def initialize window
     super(@x, @y, WIDTH - 20, HEIGHT - 4)
@@ -42,8 +42,8 @@ class Player < Rectangle
     if @action == :dying
       elapsed_time = Gosu.milliseconds - @action_start_milliseconds
       level.quit if elapsed_time >= DEATH_TIME
-      @y -= 1 if elapsed_time < DEATH_TIME / 4
-      @y += 1 if elapsed_time >= DEATH_TIME / 4
+      @y -= 1 if elapsed_time < DEATH_TIME / 6
+      @y += 1 if elapsed_time >= DEATH_TIME / 6
       return
     end
 
