@@ -6,16 +6,14 @@
 require_relative 'enemy.rb'
 
 class Slime < Enemy
-  attr_reader :images
-
   WIDTH = 16
   HEIGHT = 8
   SLIME_TIME = 2000
 
   def initialize window, x, y
-    @images = Gosu::Image::load_tiles(window, "media/SlugSlime.png", WIDTH, HEIGHT, true)
+    images = Gosu::Image::load_tiles(window, "media/SlugSlime.png", WIDTH, HEIGHT, true)
 
-    super(x, y, WIDTH, HEIGHT, @images)
+    super(x, y, WIDTH, HEIGHT, images)
 
     @creation_milliseconds = Gosu.milliseconds
   end

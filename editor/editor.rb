@@ -5,6 +5,7 @@
 
 require 'gosu'
 
+require_relative '../src/soda.rb'
 require_relative '../src/slug.rb'
 require_relative '../src/spikes.rb'
 
@@ -19,6 +20,7 @@ class Editor < Gosu::Window
     super WIDTH, HEIGHT, false
     self.caption = "Level Editor"
     @enemies = []
+    @candies = []
 
     line_no = 0
     File.readlines("levels/test.lvl").each do |line|
@@ -26,7 +28,11 @@ class Editor < Gosu::Window
         @tiles = line.split(/\s/)
       else
         x, y, type = line.split(/\s/)
-        @enemies.push(Object.const_get(type).new(self, x.to_i, y.to_i))
+        class_type = Object.const_get(type)
+        class_name_plural = class_type.superclass.to_s.downcase
+        class_name_plural[-1] = "ies"
+        array = instance_eval("@" + class_name_plural)
+        array.push(class_type.new(self, x.to_i, y.to_i))
       end
       line_no += 1
     end
@@ -108,6 +114,10 @@ class Editor < Gosu::Window
     for enemy in @enemies do
       enemy.draw SCALE
     end
+
+    for candy in @candies do
+      candy.draw SCALE
+    end
   end
 
   # method called when a button is pressed
@@ -123,6 +133,8 @@ class Editor < Gosu::Window
       @current_selection = :slug
     elsif id == Gosu::Kb4
       @current_selection = :spikes
+    elsif id == Gosu::Kb5
+      @current_selection = :soda
     elsif id == Gosu::MsLeft
       if @current_selection == :slug
         x = (mouse_x / SCALE).to_i
@@ -139,6 +151,10 @@ class Editor < Gosu::Window
         y -= y % 25
         y -= 12
         @enemies.push(Spikes.new(self, x, y))
+      elsif @current_selection == :soda
+        x = (mouse_x / SCALE).to_i
+        y = (mouse_y / SCALE).to_i
+        @candies.push(Soda.new(self, x, y))
       end
     end
   end
@@ -164,8 +180,13 @@ class Editor < Gosu::Window
           y += 1
         end
       end
+
       for enemy in @enemies do
         str += "\n#{enemy.x} #{enemy.y} #{enemy.class}"
+      end
+
+      for candy in @candies do
+        str += "\n#{candy.x} #{candy.y} #{candy.class}"
       end
       file.write(str);
     end
