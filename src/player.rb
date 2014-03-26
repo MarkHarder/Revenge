@@ -27,7 +27,8 @@ class Player < Rectangle
     @action = :falling
     @action_start_milliseconds = 0
     @bounce_start_milliseconds = 0
-    #@shoot_state: 0=nothing, >1=first shoot frame, >5=second shoot frame, >5 nothing
+    #@shoot_state: 0-9 == standing, 11-20 == jumping/falling/pogoing, other == peaceful
+    #@shoot_state only takes effect when in :violent mode
     @shoot_state = 0
     @shoot_toggle = :peaceful
   end
@@ -52,7 +53,11 @@ class Player < Rectangle
     # ~shooting
     # If 's' is pressed, shoot
     if @window.button_down? Gosu::KbS and @shoot_toggle == :peaceful
-      @shoot_state = 1
+      @shoot_state = 11 if (@action == :falling or
+                            @action == :jumping or
+                            @action == :pogo_falling or
+                            @action == :pogoing or
+                            @action == :pogo_jumping)
       shoot()
       @shoot_toggle = :violent
     end
@@ -187,13 +192,12 @@ class Player < Rectangle
     #If player is shooting
     if (@shoot_toggle == :violent and @direction == :right)
       case @shoot_state
-      when 0
+      when 0..9
+        #On the ground
         image = @sprites[16]
         @shoot_state += 1
-      when 1..5
-        image = @sprites[16]
-        @shoot_state += 1
-      when 6..10
+      when 11..20
+        #In the air
         image = @sprites[17]
         @shoot_state += 1
       end
@@ -203,13 +207,12 @@ class Player < Rectangle
     end
     if (@shoot_toggle == :violent and @direction == :left)
       case @shoot_state
-      when 0
+      when 0..9
+        #On the ground
         image = @sprites[24]
         @shoot_state += 1
-      when 1..5
-        image = @sprites[24]
-        @shoot_state += 1
-      when 6..10
+      when 11..20
+        #In the air
         image = @sprites[25]
         @shoot_state += 1
       end

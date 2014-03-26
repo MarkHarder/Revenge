@@ -83,13 +83,13 @@ class Blast < Rectangle
         can_left = true
         left_rect = Rectangle.new(@x/SCALE, @y/SCALE, @width, @height)
         #check platforms for collision
-        level.platforms.each {|p| can_left = false if right_rect.intersect?(p)}
+        level.platforms.each {|p| can_left = false if left_rect.intersect?(p)}
         #check enemies for collision
         level.enemies.each do |e|
           if left_rect.intersect?(e)
             can_left = false
             #Recognize Enemy Types
-            level.enemies.delete(p)
+            level.enemies.delete(e)
           end
         end
         can_left = false if @x <= 0
