@@ -58,6 +58,7 @@ class Player < Rectangle
                             @action == :pogo_falling or
                             @action == :pogoing or
                             @action == :pogo_jumping)
+      @action = :falling
       shoot()
       @shoot_toggle = :violent
     end
