@@ -3,12 +3,16 @@
 # ----------
 # A basic level template
 
+#enemies
 require_relative 'slug.rb'
 require_relative 'spikes.rb'
+#candies
+require_relative 'soda.rb'
+
 require_relative 'rectangle.rb'
 
 class Level
-  attr_reader :platforms, :enemies
+  attr_reader :platforms, :enemies, :candies
 
   WIDTH = 10
   HEIGHT = 10
@@ -16,6 +20,7 @@ class Level
   def initialize window
     @terrain = Gosu::Image::load_tiles(window, "media/Terrain.png", 32, 50, true)
     @enemies = []
+    @candies = []
 
     # a grid representing the tiles of the level
     # . = empty background
@@ -26,7 +31,11 @@ class Level
         @tiles = line.split(/\s/)
       else
         x, y, type = line.split(/\s/)
-        @enemies.push(Object.const_get(type).new(window, x.to_i, y.to_i))
+        class_type = Object.const_get(type)
+        class_name_plural = class_type.superclass.to_s.downcase
+        class_name_plural[-1] = "ies"
+        array = instance_eval("@" + class_name_plural)
+        array.push(class_type.new(window, x.to_i, y.to_i))
       end
       line_no += 1
     end
@@ -83,6 +92,10 @@ class Level
 
     for enemy in @enemies
       enemy.draw size
+    end
+
+    for candy in @candies
+      candy.draw size
     end
   end
 

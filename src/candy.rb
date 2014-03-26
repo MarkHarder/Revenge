@@ -5,25 +5,18 @@
 
 require_relative 'rectangle.rb'
 
-class Enemy < Rectangle
-  attr_reader :images
+class Candy < Rectangle
+  attr_reader :value
 
-  def initialize x, y, width, height, images
+  def initialize x, y, width, height, images, value
     super x, y, width, height
     @images = images
-    @harmless = false
-  end
-
-  def update level
+    @value = value
   end
 
   def draw size
     px = @x * size
     py = @y * size
     @images[0].draw(px, py, 0, size, size)
-  end
-
-  def harmless?
-    @harmless
   end
 end

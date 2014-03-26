@@ -7,16 +7,14 @@ require_relative 'enemy.rb'
 require_relative 'slime.rb'
 
 class Slug < Enemy
-  attr_reader :images
-
   WIDTH = 16
   HEIGHT = 16
   SLIME_TIME = 200
 
   def initialize window, x, y
-    @images = Gosu::Image::load_tiles(window, "media/SlugSprites.png", 23, 24, true)
+    images = Gosu::Image::load_tiles(window, "media/SlugSprites.png", 23, 24, true)
 
-    super(x, y, WIDTH, HEIGHT, @images)
+    super(x, y, WIDTH, HEIGHT, images)
 
     @window = window
     @direction = rand(2) == 0 ? :left : :right

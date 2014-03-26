@@ -7,6 +7,8 @@ require_relative 'blast.rb'
 require_relative 'rectangle.rb'
 
 class Player < Rectangle
+  attr_reader :score
+
   WIDTH = 32
   HEIGHT = 32
   JUMP_TIME = 800
@@ -23,6 +25,7 @@ class Player < Rectangle
     @y = 20
     @direction = :right
     @hang_direction = :none
+    @score = 0
 
     @sprites = Gosu::Image::load_tiles(window, "media/PlayerSprites.png", WIDTH, HEIGHT, true)
     @pullup = Gosu::Image::load_tiles(window, "media/Pullup.png", 25, 80, true)
@@ -41,6 +44,13 @@ class Player < Rectangle
     # die if you touch an enemy
     for enemy in level.enemies do
       die if intersect?(enemy) && !enemy.harmless? && @action != :dying
+    end
+
+    for candy in level.candies do
+      if intersect?(candy)
+        @score += candy.value
+        level.candies.delete(candy)
+      end
     end
 
     #check if the player falls off the map
@@ -212,6 +222,10 @@ class Player < Rectangle
 
   # draw the player on the screen
   def draw size
+    score_text = Gosu::Image.from_text(@window, @score.to_s, Gosu.default_font_name, 12 * size, 1, 100, :left)
+    score_text.draw(5, 5, 0)
+
+
     # upper left corner of player
     px = @x * size - 8 * size - 8
     py = @y * size - 4 * size
