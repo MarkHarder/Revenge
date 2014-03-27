@@ -66,7 +66,7 @@ class Blast < Rectangle
           if right_rect.intersect?(e)
             can_right = false
             #Recognize Enemy Types
-            level.enemies.delete(e)
+            level.enemies.delete(e) if e.class == Slug
           end
         end
         can_right = false if @x > @window.width-(WIDTH+SPEED)
@@ -89,7 +89,7 @@ class Blast < Rectangle
           if left_rect.intersect?(e)
             can_left = false
             #Recognize Enemy Types
-            level.enemies.delete(e)
+            level.enemies.delete(e) if e.class == Slug
           end
         end
         can_left = false if @x <= 0
