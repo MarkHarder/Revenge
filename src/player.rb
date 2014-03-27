@@ -85,7 +85,6 @@ class Player < Rectangle
     #if a blast kills an enemy, increase kill count
     if @shoot_toggle == :violent
       @blast.each do |b|
-        p @kills
         if b.kill
           @kills += 1
           #Change to recognize different values for different enemies
