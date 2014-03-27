@@ -7,9 +7,7 @@ require_relative 'blast.rb'
 require_relative 'rectangle.rb'
 
 class Player < Rectangle
-  attr_reader :score
-  attr_reader :bullets
-  attr_reader :kills
+  attr_reader :score, :bullets, :kills
 
   WIDTH = 32
   HEIGHT = 32
@@ -19,7 +17,7 @@ class Player < Rectangle
   DEATH_TIME = 2400
   PULLUP_TIME = 400
   HANG_TIME = 1000
-  SHOOT_INTERVAL = 300
+  SHOOT_TIME = 300
 
   def initialize window
     super(@x, @y, WIDTH - 20, HEIGHT - 4)
@@ -51,9 +49,11 @@ class Player < Rectangle
   def update level
     # die if you touch an enemy
     for enemy in level.enemies do
-      die if intersect?(enemy) && !enemy.harmless? && @action != :dying
+      die if intersect?(enemy) && !enemy.harmless?
     end
 
+    # collect a candy if you touch it
+    # add the candy's score to the player's score
     for candy in level.candies do
       if intersect?(candy)
         @score += candy.value
@@ -62,8 +62,12 @@ class Player < Rectangle
     end
 
     #check if the player falls off the map
-    die if level.below_screen?(@y + @height) && @action != :dying
+    die if level.below_screen?(@y + @height)
 
+    # dying animation
+    # time == DEATHTIME :: player resets or quits
+    # time <  DEATH_TIME / 6 :: player moves up
+    # time >= DEATH_TIME / 6 :: player moves down
     if @action == :dying
       elapsed_time = Gosu.milliseconds - @action_start_milliseconds
       if elapsed_time >= DEATH_TIME
@@ -75,7 +79,11 @@ class Player < Rectangle
       end
       @y -= 1 if elapsed_time < DEATH_TIME / 6
       @y += 1 if elapsed_time >= DEATH_TIME / 6
+
+      # return to prevent other actions while dying
       return
+    # player pulling themselves up from a cliff
+    # TIME >= PULLUP_TIME * 4 :: move them to top of platform
     elsif @action == :pullup
       if Gosu.milliseconds - @action_start_milliseconds >= PULLUP_TIME * 4
         @action = :none
@@ -101,7 +109,7 @@ class Player < Rectangle
       end
     end
     # If 's' is pressed, shoot
-    if @window.button_down? Gosu::KbS and Gosu.milliseconds-@shoot_start_milliseconds > SHOOT_INTERVAL
+    if @window.button_down? Gosu::KbS and Gosu.milliseconds-@shoot_start_milliseconds > SHOOT_TIME
       @shoot_anim = 11 if (@action == :falling or
                             @action == :jumping or
                             @action == :pogo_falling or
@@ -123,6 +131,8 @@ class Player < Rectangle
       end
     end
 
+    # jump when control is pressed
+    # fall when control is released
     if @window.button_down? Gosu::KbLeftControl
       if @action == :none
         @action = :jumping
@@ -133,6 +143,7 @@ class Player < Rectangle
     end
 
     # check to see if the player hits a ceiling while jumping
+    # either while jumping or pogoing
     if @action == :jumping
       up_rect = Rectangle.new(@x, @y - 1, @width, @height)
       for p in level.platforms do
@@ -156,6 +167,7 @@ class Player < Rectangle
       @y -= 1 unless @action == :falling
     end
 
+    # move the player right and left when arrow keys are pressed
     if @window.button_down? Gosu::KbRight or @window.button_down? Gosu::GpRight
       # check if there is room to move right
       # create a rectangle just to the right of the player and check
@@ -168,22 +180,27 @@ class Player < Rectangle
       @x += 1 if can_right
 
 
+      # check if you can grab onto a ledge
       if @action == :falling || @action == :jumping
-        # grab onto a ledge if it is there
-        pullup = false
+        # check if you are near the edge of a lefge
+        hang = false
         grab_rect = Rectangle.new(@x + @width, @y, 5, 5)
         for p in level.platforms do
           ledge_rect = Rectangle.new(p.x - 2, p.y - 2, 5, 5)
           if ledge_rect.intersect?(grab_rect)
-            pullup = true
+           hang = true
             @y = p.y
           end
         end
-        if pullup
+        # start hanging if you can
+        if hang
           @hang_direction = :right
           @action = :hang
           @action_start_milliseconds = Gosu.milliseconds
         end
+      # if you are hanging from a ledge you can either
+      # drop by moving away from the ledge
+      # pull yourself up by moving towards the ledge
       elsif @action == :hang 
         if @hang_direction == :right && Gosu.milliseconds - @action_start_milliseconds >= HANG_TIME
           @action = :pullup
@@ -194,6 +211,7 @@ class Player < Rectangle
       end
 
       @direction = :right
+    # same for the left direction
     elsif @window.button_down? Gosu::KbLeft or @window.button_down? Gosu::GpLeft
       # check if there is room to move left
       # create a rectangle just to the left of the player and check
@@ -235,6 +253,8 @@ class Player < Rectangle
 
     # check if there is a platform beneath the player
     # if there is no platform below the player, they fall down
+    # if there is a platform and the player is pogoing, they bounce back up
+    # if there is a platform and they are falling, stop them
     @action = :falling if @action == :none
     fall_rect = Rectangle.new(@x, @y + 1, @width, @height)
     for p in level.platforms do
@@ -254,21 +274,24 @@ class Player < Rectangle
 
   # draw the player on the screen
   def draw size
-    score_text = Gosu::Image.from_text(@window, "Score: #{@score.to_s}", Gosu.default_font_name, 12 * size, 1, 200, :left)
-    score_text.draw(5, 5, 0)
-    bullets_text = Gosu::Image.from_text(@window, "Ammo: #{@bullets.to_s}", Gosu.default_font_name, 12 * size, 1, 200, :left)
-    bullets_text.draw(5, 40, 0)
-    kills_text = Gosu::Image.from_text(@window, "Kills: #{@kills.to_s}", Gosu.default_font_name, 12 * size, 1, 200, :left)
-    kills_text.draw(5, 80, 0)
+    # draw the text statistics in the upper left of the screen
+    # score
+    # ammo
+    # kills
+    Gosu::Image.from_text(@window, "Score: #{@score.to_s}", Gosu.default_font_name, 12 * size, 1, 200, :left).draw(5, 5, 0)
+    Gosu::Image.from_text(@window, "Ammo: #{@bullets.to_s}", Gosu.default_font_name, 12 * size, 1, 200, :left).draw(5, 40, 0)
+    Gosu::Image.from_text(@window, "Kills: #{@kills.to_s}", Gosu.default_font_name, 12 * size, 1, 200, :left).draw(5, 80, 0)
 
+    # draw a heart for each life in the upper right of the screen
     @lives.times do |i|
       @heart[0].draw((@window.width / size - 20 * i - 20) * size, 2 * size, 0, size, size)
     end
 
-    # upper left corner of player
+    # upper left coordinates of player
     px = @x * size - 8 * size - 8
     py = @y * size - 4 * size
 
+    # dying animation
     if @action == :dying
       # draw the image scaled to size
       image = @sprites[(Gosu::milliseconds / 520 % 2) + 32]
@@ -276,7 +299,8 @@ class Player < Rectangle
       return
     end
 
-    # get the first image
+    # split based on the direction the player is facing
+    # from there choose the image based on the current action
     if @direction == :right
       if @action == :jumping || @action == :falling || @action == :pogo_jumping
         image = @sprites[(Gosu::milliseconds / 520 % 2) + 5]
@@ -340,7 +364,7 @@ class Player < Rectangle
     end
 
     # ~shooting
-    #If player is shooting
+    # if player is shooting
     if (@shoot_toggle == :violent and @direction == :right)
       case @shoot_anim
       when 0..9
@@ -389,13 +413,19 @@ class Player < Rectangle
     @shoot_start_milliseconds = Gosu.milliseconds
   end
 
+  # toggle the pogo stick
+  # change the player's action based on its current state
   def toggle_pogo
+    # down with stick :: down without stick
     if @action == :pogo_falling
       @action = :falling
+    # up with stick :: up without stick
     elsif @action == :pogoing
       @action = :pogo_jumping
+    # up without stick :: up with stick
     elsif @action == :pogo_jumping
       @action = :pogoing
+    # (none, down, up) without stick :: down with stick
     elsif @action == :none || @action == :falling || @action == :jumping
       if @action == :none
         @bounce_start_milliseconds = Gosu.milliseconds
@@ -408,6 +438,9 @@ class Player < Rectangle
     end
   end
 
+  # reset the game
+  # place the player back in starting position
+  # reset default values for variables
   def restart
     @x = 20
     @y = 20
@@ -416,9 +449,13 @@ class Player < Rectangle
     @action = :falling
   end
 
+  # if the player is not dying
+  # set them to dying and remove a life
   def die
-    @lives -= 1
-    @action = :dying
-    @action_start_milliseconds = Gosu.milliseconds
+    if @action != :dying
+      @lives -= 1
+      @action = :dying
+      @action_start_milliseconds = Gosu.milliseconds
+    end
   end
 end
