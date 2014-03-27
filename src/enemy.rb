@@ -19,7 +19,7 @@ class Enemy < Rectangle
   def update level
   end
 
-  # draw the first image of the given array
+  # draw the image or if an array, the first image of the array
   def draw size
     px = @x * size
     py = @y * size

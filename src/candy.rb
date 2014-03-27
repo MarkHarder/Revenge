@@ -1,7 +1,8 @@
 # Stephen Quenzer
 # Mark Harder
 # ----------
-# Enemy
+# Candy base class
+# contains position, dimensions, images, and a value
 
 require_relative 'rectangle.rb'
 
@@ -14,9 +15,12 @@ class Candy < Rectangle
     @value = value
   end
 
+  # draw the image or if an array, the first image of the array
   def draw size
     px = @x * size
     py = @y * size
-    @images[0].draw(px, py, 0, size, size)
+
+    image = @images.is_a?(Array) ? @images[0] : @images
+    image.draw(px, py, 0, size, size)
   end
 end
