@@ -28,20 +28,24 @@ class Level
     line_no = 0
     File.readlines("levels/first.lvl").each do |line|
       if line_no == 0
+        # load the tiles (platforms, background, empty space)
         @tiles = line.split(/\s/)
       else
+        # load the enemies and candies
         x, y, type = line.split(/\s/)
         class_type = Object.const_get(type)
         class_name_plural = class_type.superclass.to_s.downcase
         class_name_plural[-1] = "ies"
+        # grab the correct array
         array = instance_eval("@" + class_name_plural)
+        # place a new object of type 'type' with the given parameters
         array.push(class_type.new(window, x.to_i, y.to_i))
       end
       line_no += 1
     end
     @platforms = []
 
-    # add all the rectangles to check for collision
+    # add all the platform rectangles to check for collision
     0.upto(WIDTH - 1) do |x|
       0.upto(HEIGHT - 1) do |y|
         @platforms.push(Rectangle.new(x * 32, y * 25 - 12, 32, 37)) if @tiles[x + y * WIDTH] == '-'
