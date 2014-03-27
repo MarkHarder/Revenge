@@ -17,6 +17,7 @@ class Player < Rectangle
   DEATH_TIME = 2400
   PULLUP_TIME = 400
   HANG_TIME = 1000
+  SHOOT_INTERVAL = 300
 
   def initialize window
     super(@x, @y, WIDTH - 20, HEIGHT - 4)
@@ -34,9 +35,10 @@ class Player < Rectangle
     @action = :falling
     @action_start_milliseconds = 0
     @bounce_start_milliseconds = 0
-    #@shoot_state: 0-9 == standing, 11-20 == jumping/falling/pogoing, other == peaceful
-    #@shoot_state only takes effect when in :violent mode
-    @shoot_state = 0
+    @shoot_start_milliseconds = 0
+    #@shoot_anim: 0-9 == standing, 11-20 == jumping/falling/pogoing, other == peaceful
+    #@shoot_anim only takes effect when in :violent mode
+    @shoot_anim = 0
     @shoot_toggle = :peaceful
   end
 
@@ -77,19 +79,26 @@ class Player < Rectangle
     
     # ~shooting
     # If 's' is pressed, shoot
-    if @window.button_down? Gosu::KbS and @shoot_toggle == :peaceful
-      @shoot_state = 11 if (@action == :falling or
+    if @window.button_down? Gosu::KbS and Gosu.milliseconds-@shoot_start_milliseconds > SHOOT_INTERVAL
+      @shoot_anim = 11 if (@action == :falling or
                             @action == :jumping or
                             @action == :pogo_falling or
                             @action == :pogoing or
                             @action == :pogo_jumping)
       @action = :falling
       shoot()
-      @shoot_toggle = :violent
     end
     if @shoot_toggle == :violent
-      @blast.update level
-      @shoot_toggle = :peaceful if @blast.finished?
+      @blast.each do |b|
+        b.update level
+        #Check if all blasts have finished
+        if b.finished?
+          @blast.delete(b)
+        end
+      end
+      if @blast.empty?
+        @shoot_toggle = :peaceful
+      end
     end
     
     if @window.button_down? Gosu::KbLeftControl
@@ -304,34 +313,38 @@ class Player < Rectangle
     # ~shooting
     #If player is shooting
     if (@shoot_toggle == :violent and @direction == :right)
-      case @shoot_state
+      case @shoot_anim
       when 0..9
         #On the ground
         image = @sprites[16]
-        @shoot_state += 1
+        @shoot_anim += 1
       when 11..20
         #In the air
         image = @sprites[17]
-        @shoot_state += 1
+        @shoot_anim += 1
+      else
+        #@shoot_toggle = :peaceful
       end
-      @blast.draw(size)
+      @blast.each {|b| b.draw(size)}
     elsif @shoot_toggle == :peaceful
-      @shoot_state = 0
+      @shoot_anim = 0
     end
     if (@shoot_toggle == :violent and @direction == :left)
-      case @shoot_state
+      case @shoot_anim
       when 0..9
         #On the ground
         image = @sprites[24]
-        @shoot_state += 1
+        @shoot_anim += 1
       when 11..20
         #In the air
         image = @sprites[25]
-        @shoot_state += 1
+        @shoot_anim += 1
+      else
+        #@shoot_toggle = :peaceful
       end
-      @blast.draw(size)
+      @blast.each {|b| b.draw(size)}
     elsif @shoot_toggle == :peaceful
-      @shoot_state = 0
+      @shoot_anim = 0
     end
 
     # draw the image scaled to size
@@ -340,7 +353,10 @@ class Player < Rectangle
   
   def shoot
     #Replace 3 with SCALE value
-    @blast = Blast.new(@window, @direction, @x*3, @y*3, WIDTH)
+    @blast ||= []
+    @blast.push(Blast.new(@window, @direction, @x*3, @y*3, WIDTH))
+    @shoot_toggle = :violent
+    @shoot_start_milliseconds = Gosu.milliseconds
   end
 
   def toggle_pogo

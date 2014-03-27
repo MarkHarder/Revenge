@@ -127,6 +127,6 @@ class Blast < Rectangle
   end
   
   def finished?
-    true if @state == :finished
+    @state == :finished
   end
 end
