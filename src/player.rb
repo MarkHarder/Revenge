@@ -8,6 +8,8 @@ require_relative 'rectangle.rb'
 
 class Player < Rectangle
   attr_reader :score
+  attr_reader :bullets
+  attr_reader :kills
 
   WIDTH = 32
   HEIGHT = 32
@@ -27,6 +29,8 @@ class Player < Rectangle
     @direction = :right
     @hang_direction = :none
     @score = 0
+    @kills = 0
+    @bullets = 100
 
     @sprites = Gosu::Image::load_tiles(window, "media/PlayerSprites.png", WIDTH, HEIGHT, true)
     @pullup = Gosu::Image::load_tiles(window, "media/Pullup.png", 25, 80, true)
@@ -78,6 +82,17 @@ class Player < Rectangle
     end
     
     # ~shooting
+    #if a blast kills an enemy, increase kill count
+    if @shoot_toggle == :violent
+      @blast.each do |b|
+        p @kills
+        if b.kill
+          @kills += 1
+          #Change to recognize different values for different enemies
+          @score += 25
+        end
+      end
+    end
     # If 's' is pressed, shoot
     if @window.button_down? Gosu::KbS and Gosu.milliseconds-@shoot_start_milliseconds > SHOOT_INTERVAL
       @shoot_anim = 11 if (@action == :falling or
@@ -232,8 +247,12 @@ class Player < Rectangle
 
   # draw the player on the screen
   def draw size
-    score_text = Gosu::Image.from_text(@window, @score.to_s, Gosu.default_font_name, 12 * size, 1, 100, :left)
+    score_text = Gosu::Image.from_text(@window, "Score: #{@score.to_s}", Gosu.default_font_name, 12 * size, 1, 200, :left)
     score_text.draw(5, 5, 0)
+    bullets_text = Gosu::Image.from_text(@window, "Ammo: #{@bullets.to_s}", Gosu.default_font_name, 12 * size, 1, 200, :left)
+    bullets_text.draw(5, 40, 0)
+    kills_text = Gosu::Image.from_text(@window, "Kills: #{@kills.to_s}", Gosu.default_font_name, 12 * size, 1, 200, :left)
+    kills_text.draw(5, 80, 0)
 
 
     # upper left corner of player
@@ -355,6 +374,7 @@ class Player < Rectangle
     #Replace 3 with SCALE value
     @blast ||= []
     @blast.push(Blast.new(@window, @direction, @x*3, @y*3, WIDTH))
+    @bullets -= 1
     @shoot_toggle = :violent
     @shoot_start_milliseconds = Gosu.milliseconds
   end

@@ -11,6 +11,7 @@ class Blast < Rectangle
   SPEED = 10
   SCALE = 3
   EXPLOSION_TIME = 240
+  attr_reader :kill
   
   def initialize(window, direction, x, y, offset)
     super(x, y, WIDTH, HEIGHT)
@@ -26,6 +27,7 @@ class Blast < Rectangle
     @y = y
     
     @collisionWith = :none
+    @kill = false
     
     #Possible states:
     ## :Initial - First couple frames of animation
@@ -43,6 +45,8 @@ class Blast < Rectangle
   def update level
     @x = 0 if @x <= 0
     @x = @window.width-30 if @x > @window.width-30
+    # Kill can only be true for one frame
+    @kill = false if @kill
     # Check the state of the blast
     if @state == :initial
     elsif @state == :moving
@@ -66,7 +70,10 @@ class Blast < Rectangle
           if right_rect.intersect?(e)
             can_right = false
             #Recognize Enemy Types
-            level.enemies.delete(e) if e.class == Slug
+            if e.class == Slug
+              level.enemies.delete(e)
+              @kill = true
+            end
           end
         end
         can_right = false if @x > @window.width-(WIDTH+SPEED)
@@ -89,7 +96,10 @@ class Blast < Rectangle
           if left_rect.intersect?(e)
             can_left = false
             #Recognize Enemy Types
-            level.enemies.delete(e) if e.class == Slug
+            if e.class == Slug
+              level.enemies.delete(e) 
+              @kill = true
+            end
           end
         end
         can_left = false if @x <= 0
