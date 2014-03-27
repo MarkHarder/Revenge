@@ -31,9 +31,12 @@ class Player < Rectangle
     @score = 0
     @kills = 0
     @bullets = 100
+    @lives = 3
+>>>>>>> feature-lives
 
     @sprites = Gosu::Image::load_tiles(window, "media/PlayerSprites.png", WIDTH, HEIGHT, true)
     @pullup = Gosu::Image::load_tiles(window, "media/Pullup.png", 25, 80, true)
+    @heart = Gosu::Image::load_tiles(window, "media/Life.png", 16, 16, true)
 
     @window = window
     @action = :falling
@@ -64,7 +67,13 @@ class Player < Rectangle
 
     if @action == :dying
       elapsed_time = Gosu.milliseconds - @action_start_milliseconds
-      level.quit if elapsed_time >= DEATH_TIME
+      if elapsed_time >= DEATH_TIME
+        if @lives >= 0
+          restart
+        else
+          level.quit
+        end
+      end
       @y -= 1 if elapsed_time < DEATH_TIME / 6
       @y += 1 if elapsed_time >= DEATH_TIME / 6
       return
@@ -80,7 +89,7 @@ class Player < Rectangle
         end
       end
     end
-    
+
     # ~shooting
     #if a blast kills an enemy, increase kill count
     if @shoot_toggle == :violent
@@ -114,7 +123,7 @@ class Player < Rectangle
         @shoot_toggle = :peaceful
       end
     end
-    
+
     if @window.button_down? Gosu::KbLeftControl
       if @action == :none
         @action = :jumping
@@ -224,7 +233,7 @@ class Player < Rectangle
 
       @direction = :left
     end
- 
+
     # check if there is a platform beneath the player
     # if there is no platform below the player, they fall down
     @action = :falling if @action == :none
@@ -253,6 +262,9 @@ class Player < Rectangle
     kills_text = Gosu::Image.from_text(@window, "Kills: #{@kills.to_s}", Gosu.default_font_name, 12 * size, 1, 200, :left)
     kills_text.draw(5, 80, 0)
 
+    @lives.times do |i|
+      @heart[0].draw((@window.width / size - 20 * i - 20) * size, 2 * size, 0, size, size)
+    end
 
     # upper left corner of player
     px = @x * size - 8 * size - 8
@@ -327,7 +339,7 @@ class Player < Rectangle
         end
       end
     end
-    
+
     # ~shooting
     #If player is shooting
     if (@shoot_toggle == :violent and @direction == :right)
@@ -368,7 +380,7 @@ class Player < Rectangle
     # draw the image scaled to size
     image.draw(px, py, 0, size, size)
   end
-  
+
   def shoot
     #Replace 3 with SCALE value
     @blast ||= []
@@ -397,7 +409,16 @@ class Player < Rectangle
     end
   end
 
+  def restart
+    @x = 20
+    @y = 20
+    @direction = :right
+    @hang_direction = :none
+    @action = :falling
+  end
+
   def die
+    @lives -= 1
     @action = :dying
     @action_start_milliseconds = Gosu.milliseconds
   end
