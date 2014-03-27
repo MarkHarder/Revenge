@@ -14,11 +14,16 @@ require_relative 'rectangle.rb'
 class Level
   attr_reader :platforms, :enemies, :candies
 
+  # number of tiles wide and high
   WIDTH = 10
   HEIGHT = 10
 
+  TILE_WIDTH = 32
+  TILE_HEIGHT = 25
+  Y_OFFSET = 12
+
   def initialize window
-    @terrain = Gosu::Image::load_tiles(window, "media/Terrain.png", 32, 50, true)
+    @terrain = Gosu::Image::load_tiles(window, "media/Terrain.png", TILE_WIDTH, TILE_HEIGHT * 2, true)
     @enemies = []
     @candies = []
 
@@ -30,6 +35,16 @@ class Level
       if line_no == 0
         # load the tiles (platforms, background, empty space)
         @tiles = line.split(/\s/)
+
+        @tile_types = {
+          "." => :background,
+          "-" => :platform,
+          "x" => :none,
+        }
+
+        # change from small single-character representations of tiles
+        # to full name representations
+        @tiles.collect! { |t| @tile_types[t] }
       else
         # load the enemies and candies
         x, y, type = line.split(/\s/)
@@ -48,7 +63,7 @@ class Level
     # add all the platform rectangles to check for collision
     0.upto(WIDTH - 1) do |x|
       0.upto(HEIGHT - 1) do |y|
-        @platforms.push(Rectangle.new(x * 32, y * 25 - 12, 32, 37)) if @tiles[x + y * WIDTH] == '-'
+        @platforms.push(Rectangle.new(x * TILE_WIDTH, y * TILE_HEIGHT - Y_OFFSET, TILE_WIDTH, TILE_HEIGHT + Y_OFFSET)) if @tiles[x + y * WIDTH] == :platform
       end
     end
 
@@ -67,12 +82,12 @@ class Level
     # draw background first
     0.upto(WIDTH - 1) do |x|
       (HEIGHT - 1).downto(0) do |y|
-        if @tiles[x + WIDTH * y] == '.'
+        if @tiles[x + WIDTH * y] == :background
           # choose background terrain
           image = @terrain[1]
           # actual top left coordinates
-          px = x * 32 * size
-          py = y * 25 * size - 25 * size
+          px = x * TILE_WIDTH * size
+          py = y * TILE_HEIGHT * size - TILE_HEIGHT * size
           # draw to the screen scaled to size
           image.draw(px, py, 0, size, size)
         end
@@ -82,12 +97,12 @@ class Level
     # draw platforms on top of the background
     0.upto(WIDTH - 1) do |x|
       (HEIGHT - 1).downto(0) do |y|
-        if @tiles[x + WIDTH * y] == '-'
+        if @tiles[x + WIDTH * y] == :platform
           # choose platform terrain
           image = @terrain[0]
           # actual top left coordinates
-          px = x * 32 * size
-          py = y * 25 * size - 25 * size
+          px = x * TILE_WIDTH * size
+          py = y * TILE_HEIGHT * size - TILE_HEIGHT * size
           # draw to the screen scaled to size
           image.draw(px, py, 0, size, size)
         end
@@ -107,7 +122,8 @@ class Level
     exit
   end
 
-  def below_screen y
-    y >= @window.height / 3
+  # is the player below the screen?
+  def below_screen? y
+    y >= HEIGHT * TILE_HEIGHT
   end
 end
