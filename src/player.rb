@@ -32,7 +32,6 @@ class Player < Rectangle
     @kills = 0
     @bullets = 100
     @lives = 3
->>>>>>> feature-lives
 
     @sprites = Gosu::Image::load_tiles(window, "media/PlayerSprites.png", WIDTH, HEIGHT, true)
     @pullup = Gosu::Image::load_tiles(window, "media/Pullup.png", 25, 80, true)
