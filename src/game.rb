@@ -28,7 +28,7 @@ class Game < Gosu::Window
 
   # draw the components of the game
   def draw
-    @level.draw SCALE
+    @level.draw SCALE, @player.x * SCALE, @player.y * SCALE
     @player.draw SCALE
   end
 

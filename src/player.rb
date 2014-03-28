@@ -7,7 +7,7 @@ require_relative 'blast.rb'
 require_relative 'rectangle.rb'
 
 class Player < Rectangle
-  attr_reader :score, :bullets, :kills
+  attr_reader :x, :y, :score, :bullets, :kills
 
   WIDTH = 32
   HEIGHT = 32
@@ -274,6 +274,12 @@ class Player < Rectangle
 
   # draw the player on the screen
   def draw size
+    # upper left coordinates of player
+    px = @window.width / (2 * size) - WIDTH / 2
+    py = @window.height / (2 * size) - HEIGHT / 2
+    px *= size
+    py *= size
+
     # draw the text statistics in the upper left of the screen
     # score
     # ammo
@@ -286,10 +292,6 @@ class Player < Rectangle
     @lives.times do |i|
       @heart[0].draw((@window.width / size - 20 * i - 20) * size, 2 * size, 0, size, size)
     end
-
-    # upper left coordinates of player
-    px = @x * size - 8 * size - 8
-    py = @y * size - 4 * size
 
     # dying animation
     if @action == :dying
@@ -315,12 +317,12 @@ class Player < Rectangle
       elsif @action == :none
         image = @sprites[0]
       elsif @action == :hang
-        px += 20
-        py -= 60
+        px += 25
+        py -= 90
         image = @pullup[5]
       elsif @action == :pullup
-        px += 30
-        py -= 80
+        px += 45
+        py -= 90
         if Gosu.milliseconds - @action_start_milliseconds >= PULLUP_TIME * 3
           image = @pullup[9]
         elsif Gosu.milliseconds - @action_start_milliseconds >= PULLUP_TIME * 2
@@ -346,11 +348,11 @@ class Player < Rectangle
         image = @sprites[8]
       elsif @action == :hang
         px += 10
-        py -= 60
+        py -= 90
         image = @pullup[0]
       elsif @action == :pullup
-        px -= 20
-        py -= 80
+        px -= 0
+        py -= 90
         if Gosu.milliseconds - @action_start_milliseconds >= PULLUP_TIME * 3
           image = @pullup[4]
         elsif Gosu.milliseconds - @action_start_milliseconds >= PULLUP_TIME * 2

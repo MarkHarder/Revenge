@@ -78,7 +78,9 @@ class Level
 
   # draw the level on the screen
   # draw the background and platforms
-  def draw size
+  def draw size, x_offset=0, y_offset=0
+    x_offset -= 470
+    y_offset -= 330
     # draw background first
     0.upto(WIDTH - 1) do |x|
       (HEIGHT - 1).downto(0) do |y|
@@ -89,7 +91,7 @@ class Level
           px = x * TILE_WIDTH * size
           py = y * TILE_HEIGHT * size - TILE_HEIGHT * size
           # draw to the screen scaled to size
-          image.draw(px, py, 0, size, size)
+          image.draw(px - x_offset, py - y_offset, 0, size, size)
         end
       end
     end
@@ -104,17 +106,17 @@ class Level
           px = x * TILE_WIDTH * size
           py = y * TILE_HEIGHT * size - TILE_HEIGHT * size
           # draw to the screen scaled to size
-          image.draw(px, py, 0, size, size)
+          image.draw(px - x_offset, py - y_offset, 0, size, size)
         end
       end
     end
 
     for enemy in @enemies
-      enemy.draw size
+      enemy.draw size, x_offset, y_offset
     end
 
     for candy in @candies
-      candy.draw size
+      candy.draw size, x_offset, y_offset
     end
   end
 

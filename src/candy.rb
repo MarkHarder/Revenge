@@ -16,11 +16,11 @@ class Candy < Rectangle
   end
 
   # draw the image or if an array, the first image of the array
-  def draw size
+  def draw size, x_offset, y_offset
     px = @x * size
     py = @y * size
 
     image = @images.is_a?(Array) ? @images[0] : @images
-    image.draw(px, py, 0, size, size)
+    image.draw(px - x_offset, py - y_offset, 0, size, size)
   end
 end

@@ -80,7 +80,7 @@ class Slug < Enemy
   end
 
   # choose the right image based on the slug's action and direction
-  def draw size
+  def draw size, x_offset, y_offset
     image = @images[0]
 
     px = @x * size
@@ -101,6 +101,6 @@ class Slug < Enemy
       end
     end
 
-    image.draw(px, py, 0, size, size)
+    image.draw(px - x_offset, py - y_offset, 0, size, size)
   end
 end

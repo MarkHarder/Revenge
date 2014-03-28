@@ -26,13 +26,13 @@ class Slime < Enemy
     end
   end
 
-  def draw size
+  def draw size, x_offset, y_offset
     image = @images[0]
     image = @images[1] if @harmless
 
     px = @x * size
     py = @y * size
 
-    image.draw(px, py, 0, size, size)
+    image.draw(px - x_offset, py - y_offset, 0, size, size)
   end
 end
