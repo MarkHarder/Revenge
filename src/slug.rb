@@ -49,13 +49,19 @@ class Slug < Enemy
 
     # turn if a rectangle slightly lower and to the left of the slug
     # doesn't intersect any platforms
+    # also check if there is a platform right in front of it
     # same but on the right for turning back when it is facing right
     if @direction == :left
       left_turn = Rectangle.new(@x - 1, @y + HEIGHT + 5, 5, 5)
+      platform_turn = Rectangle.new(@x - 2, @y, 5, 5)
       can_turn = true
       for p in level.platforms do
         if left_turn.intersect?(p)
           can_turn = false
+        end
+        if platform_turn.intersect?(p)
+          can_turn = true
+          break
         end
       end
       if can_turn
@@ -65,10 +71,15 @@ class Slug < Enemy
       end
     else
       right_turn = Rectangle.new(@x + WIDTH + 1, @y + HEIGHT + 5, 5, 5)
+      platform_turn = Rectangle.new(@x + WIDTH + 2, @y, 5, 5)
       can_turn = true
       for p in level.platforms do
         if right_turn.intersect?(p)
           can_turn = false
+        end
+        if platform_turn.intersect?(p)
+          can_turn = true
+          break
         end
       end
       if can_turn
