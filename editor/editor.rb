@@ -13,8 +13,8 @@ class Editor < Gosu::Window
   SCALE = 3
   WIDTH = 32 * 10 * SCALE
   HEIGHT = 25 * 10 * SCALE
-  LEVEL_HEIGHT = 10
-  LEVEL_WIDTH = 10
+  LEVEL_HEIGHT = 20
+  LEVEL_WIDTH = 20
 
   def initialize
     super WIDTH, HEIGHT, false
@@ -23,18 +23,23 @@ class Editor < Gosu::Window
     @candies = []
 
     line_no = 0
-    File.readlines("levels/test.lvl").each do |line|
-      if line_no == 0
-        @tiles = line.split(/\s/)
-      else
-        x, y, type = line.split(/\s/)
-        class_type = Object.const_get(type)
-        class_name_plural = class_type.superclass.to_s.downcase
-        class_name_plural[-1] = "ies"
-        array = instance_eval("@" + class_name_plural)
-        array.push(class_type.new(self, x.to_i, y.to_i))
+    if File.exists?("levels/test.lvl")
+      File.readlines("levels/test.lvl").each do |line|
+        if line_no == 0
+          @tiles = line.split(/\s/)
+        else
+          x, y, type = line.split(/\s/)
+          class_type = Object.const_get(type)
+          class_name_plural = class_type.superclass.to_s.downcase
+          class_name_plural[-1] = "ies"
+          array = instance_eval("@" + class_name_plural)
+          array.push(class_type.new(self, x.to_i, y.to_i))
+        end
+        line_no += 1
       end
-      line_no += 1
+    else
+      @tiles = []
+      (LEVEL_WIDTH * LEVEL_HEIGHT).times { @tiles.push("x") }
     end
 
     @swap = {
@@ -57,6 +62,8 @@ class Editor < Gosu::Window
     }
 
     @current_selection = :background
+    @x_offset = 0
+    @y_offset = 0
   end
 
   def needs_cursor?
@@ -67,7 +74,11 @@ class Editor < Gosu::Window
   def update
     if button_down? Gosu::MsLeft
       if @current_selection == :platform || @current_selection == :background
-        @tiles[(mouse_x / (32 * SCALE)).to_i + (mouse_y / (25 * SCALE)).to_i * LEVEL_WIDTH] = @current_selection
+        x = mouse_x / (32 * SCALE)
+        x += @x_offset
+        y = mouse_y / (25 * SCALE)
+        y += @y_offset
+        @tiles[x.to_i + y.to_i * LEVEL_WIDTH] = @current_selection
       end
     end
   end
@@ -77,7 +88,7 @@ class Editor < Gosu::Window
     # draw background first
     0.upto(LEVEL_WIDTH - 1) do |x|
       (LEVEL_HEIGHT - 1).downto(0) do |y|
-        if @tiles[x + LEVEL_WIDTH * y] == :background
+        if @tiles[x + @x_offset + LEVEL_WIDTH * (y + @y_offset)] == :background
           # choose background terrain
           image = @terrain[1]
           # actual top left coordinates
@@ -85,7 +96,7 @@ class Editor < Gosu::Window
           py = y * 25 * SCALE - 25 * SCALE
           # draw to the screen scaled to size
           image.draw(px, py, 0, SCALE, SCALE)
-        elsif @tiles[x + LEVEL_WIDTH * y] == :none
+        elsif @tiles[x + @x_offset + LEVEL_WIDTH * (y + @y_offset)] == :none
           image = @terrain[2]
           # actual top left coordinates
           px = x * 32 * SCALE
@@ -99,7 +110,7 @@ class Editor < Gosu::Window
     # draw platforms on top of the background
     0.upto(LEVEL_WIDTH - 1) do |x|
       (LEVEL_HEIGHT - 1).downto(0) do |y|
-        if @tiles[x + LEVEL_WIDTH * y] == :platform
+        if @tiles[x + @x_offset + LEVEL_WIDTH * (y + @y_offset)] == :platform
           # choose platform terrain
           image = @terrain[0]
           # actual top left coordinates
@@ -112,11 +123,11 @@ class Editor < Gosu::Window
     end
 
     for enemy in @enemies do
-      enemy.draw SCALE
+      enemy.draw SCALE, @x_offset * 32 * SCALE, @y_offset * 25 * SCALE
     end
 
     for candy in @candies do
-      candy.draw SCALE
+      candy.draw SCALE, @x_offset * 32 * SCALE, @y_offset * 25 * SCALE
     end
   end
 
@@ -125,6 +136,14 @@ class Editor < Gosu::Window
     if id == Gosu::KbEscape || id == Gosu::KbQ
       save
       close
+    elsif id == Gosu::KbLeft || id == Gosu::GpLeft
+      @x_offset -= 1 if @x_offset > 0
+    elsif id == Gosu::KbUp || id == Gosu::GpUp
+      @y_offset -= 1 if @y_offset > 0
+    elsif id == Gosu::KbRight || id == Gosu::GpRight
+      @x_offset += 1 if @x_offset < LEVEL_WIDTH - 10
+    elsif id == Gosu::KbDown || id == Gosu::GpDown
+      @y_offset += 1 if @y_offset < LEVEL_HEIGHT - 10
     elsif id == Gosu::Kb1
       @current_selection = :background
     elsif id == Gosu::Kb2
@@ -139,9 +158,11 @@ class Editor < Gosu::Window
       if @current_selection == :slug
         x = (mouse_x / SCALE).to_i
         x -= x % 32
+        x += 32 * @x_offset
         y = (mouse_y / SCALE).to_i
         y -= y % 25
         y -= 12
+        y += 25 * @y_offset
         @enemies.push(Slug.new(self, x, y))
       elsif @current_selection == :spikes
         x = (mouse_x / SCALE).to_i
@@ -150,10 +171,14 @@ class Editor < Gosu::Window
         y = (mouse_y / SCALE).to_i
         y -= y % 25
         y -= 12
+        x += 32 * @x_offset
+        y += 25 * @y_offset
         @enemies.push(Spikes.new(self, x, y))
       elsif @current_selection == :soda
         x = (mouse_x / SCALE).to_i
         y = (mouse_y / SCALE).to_i
+        x += 32 * @x_offset
+        y += 25 * @y_offset
         @candies.push(Soda.new(self, x, y))
       end
     end

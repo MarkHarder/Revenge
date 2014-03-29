@@ -15,8 +15,8 @@ class Level
   attr_reader :platforms, :enemies, :candies
 
   # number of tiles wide and high
-  WIDTH = 10
-  HEIGHT = 10
+  WIDTH = 20
+  HEIGHT = 20
 
   TILE_WIDTH = 32
   TILE_HEIGHT = 25
