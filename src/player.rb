@@ -1,24 +1,41 @@
-# Stephen Quenzer
-# Mark Harder
-# ----------
-# A class to store information about the player
-
 require_relative 'blast.rb'
 require_relative 'rectangle.rb'
+
+##
+# A class to store information about the player
 
 class Player < Rectangle
   attr_reader :x, :y, :score, :bullets, :kills
 
+  ##
+  # The width of the player in pixels
   WIDTH = 32
+  ##
+  # The height of the player in pixels
   HEIGHT = 32
+  ##
+  # The amount of time the player moves upwards during a jump
   JUMP_TIME = 800
+  ##
+  # The amount of time the player moves upwards during a pogo bounce
   POGO_TIME = 1200
+  ##
+  # The amount of time the bounce animation when the player hits the ground
+  # on a pogo stick
   BOUNCE_TIME = 200
+  ##
+  # The amount of time the player moves upwards when dying
   DEATH_TIME = 2400
+  ##
+  # The amount of time it takes to do a pullup
   PULLUP_TIME = 400
+  ##
+  # The amount of time you hang on a cliff before you can move
   HANG_TIME = 1000
   SHOOT_TIME = 300
 
+  ##
+  # Create a player
   def initialize window
     super(@x, @y, WIDTH - 20, HEIGHT - 4)
 
@@ -46,6 +63,8 @@ class Player < Rectangle
     @shoot_toggle = :peaceful
   end
 
+  ##
+  # Update the player based on direction and action
   def update level
     # die if you touch an enemy
     for enemy in level.enemies do
@@ -272,7 +291,8 @@ class Player < Rectangle
     @y += 1 if @action == :falling || @action == :pogo_falling
   end
 
-  # draw the player on the screen
+  ##
+  # Draw the player on the screen
   def draw size
     # upper left coordinates of player
     px = @window.width / (2 * size) - WIDTH / 2
@@ -415,8 +435,9 @@ class Player < Rectangle
     @shoot_start_milliseconds = Gosu.milliseconds
   end
 
-  # toggle the pogo stick
-  # change the player's action based on its current state
+  ##
+  # Toggle the pogo stick
+  # Change the player's action based on its current state
   def toggle_pogo
     # down with stick :: down without stick
     if @action == :pogo_falling
@@ -440,6 +461,7 @@ class Player < Rectangle
     end
   end
 
+  ##
   # reset the game
   # place the player back in starting position
   # reset default values for variables
@@ -451,6 +473,7 @@ class Player < Rectangle
     @action = :falling
   end
 
+  ##
   # if the player is not dying
   # set them to dying and remove a life
   def die

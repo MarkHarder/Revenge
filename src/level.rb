@@ -1,8 +1,3 @@
-# Stephen Quenzer
-# Mark Harder
-# ----------
-# A basic level template
-
 #enemies
 require_relative 'slug.rb'
 require_relative 'spikes.rb'
@@ -11,17 +6,33 @@ require_relative 'soda.rb'
 
 require_relative 'rectangle.rb'
 
+##
+# A basic level template
+
 class Level
   attr_reader :platforms, :enemies, :candies
 
-  # number of tiles wide and high
+  ##
+  # Level width - number of tiles wide
   WIDTH = 20
+  ##
+  # Level height - number of tiles tall
   HEIGHT = 20
 
+  ##
+  # The width in pixels of a tile
   TILE_WIDTH = 32
+  ##
+  # The height in pixels of a tile
   TILE_HEIGHT = 25
+  ##
+  # The y-offset for platform tiles
   Y_OFFSET = 12
 
+  ##
+  # Create a level.
+  # Set up the enemies and the candies
+  # Load information from the level file
   def initialize window
     @terrain = Gosu::Image::load_tiles(window, "media/Terrain.png", TILE_WIDTH, TILE_HEIGHT * 2, true)
     @enemies = []
@@ -70,14 +81,17 @@ class Level
     @window = window
   end
 
+  ##
+  # Update all the enemies
   def update
     for enemy in @enemies do
       enemy.update self
     end
   end
 
-  # draw the level on the screen
-  # draw the background and platforms
+  ##
+  # Draw the level on the screen
+  # Draw the background and platforms
   def draw size, x_offset=0, y_offset=0
     x_offset -= 470
     y_offset -= 330
@@ -120,11 +134,14 @@ class Level
     end
   end
 
+  ##
+  # Quit the game
   def quit
     exit
   end
 
-  # is the player below the screen?
+  ##
+  # Check if the the player is below the screen
   def below_screen? y
     y >= HEIGHT * TILE_HEIGHT
   end

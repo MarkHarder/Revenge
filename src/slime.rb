@@ -1,15 +1,23 @@
-# Stephen Quenzer
-# Mark Harder
-# ----------
-# The slime class, template for slug slime
-
 require_relative 'enemy.rb'
 
+##
+# The slime class
+
 class Slime < Enemy
+  ##
+  # Slime width
   WIDTH = 16
+  ##
+  # Slime height
   HEIGHT = 8
+  ##
+  # Time before the slime turns harmless.
+  # Same time until it disappears
   SLIME_TIME = 2000
 
+  ##
+  # Create a slime.
+  # Record the time it was created
   def initialize window, x, y
     images = Gosu::Image::load_tiles(window, "media/SlugSlime.png", WIDTH, HEIGHT, true)
 
@@ -18,6 +26,8 @@ class Slime < Enemy
     @creation_milliseconds = Gosu.milliseconds
   end
 
+  ##
+  # Check if the slime is harmless or if it disappears
   def update level
     if Gosu.milliseconds - @creation_milliseconds >= SLIME_TIME * 2
       level.enemies.delete(self)
@@ -26,6 +36,8 @@ class Slime < Enemy
     end
   end
 
+  ##
+  # Draw the slime or the harmless slime
   def draw size, x_offset, y_offset
     image = @images[0]
     image = @images[1] if @harmless

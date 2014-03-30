@@ -1,10 +1,8 @@
-# Stephen Quenzer
-# Mark Harder
-# ----------
+require_relative 'rectangle.rb'
+
+##
 # Candy base class
 # contains position, dimensions, images, and a value
-
-require_relative 'rectangle.rb'
 
 class Candy < Rectangle
   attr_reader :value
@@ -15,6 +13,7 @@ class Candy < Rectangle
     @value = value
   end
 
+  ##
   # draw the image or if an array, the first image of the array
   def draw size, x_offset, y_offset
     px = @x * size

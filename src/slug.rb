@@ -1,17 +1,27 @@
-# Stephen Quenzer
-# Mark Harder
-# ----------
-# The slug class, template for all slug enemies
-
 require_relative 'enemy.rb'
 require_relative 'slime.rb'
 
+##
+# An +enemy+, template for all slug enemies
+
 class Slug < Enemy
+  ##
+  # Slug width
   WIDTH = 16
+  ##
+  # Slug height
   HEIGHT = 16
+  ##
+  # Time it takes to put down a slime
   SLIME_TIME = 200
+  ##
+  # The movement speed of the slug
   SPEED = 0.3
 
+  ##
+  # Create a slug.
+  #
+  # Randomly choose to face left or right.
   def initialize window, x, y
     images = Gosu::Image::load_tiles(window, "media/SlugSprites.png", 23, 24, true)
 
@@ -28,6 +38,8 @@ class Slug < Enemy
     @action_start_milliseconds = 0
   end
 
+  ##
+  # Update the slug. Either move it or start place slime
   def update level
     if @action == :moving
       # random chance it will start droping slime

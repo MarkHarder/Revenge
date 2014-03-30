@@ -9,3 +9,8 @@ desc "edit"
 task :edit do
   sh "ruby editor/editor.rb"
 end
+
+desc "documentation"
+task :doc do
+  sh "rdoc src"
+end

@@ -1,15 +1,18 @@
-# Stephen Quenzer
-# Mark Harder
-# ----------
+require_relative 'rectangle.rb'
+
+##
 # Enemy base class
+#
 # contains the position, dimensions, and images
 # along with base methods for drawing and updating
-
-require_relative 'rectangle.rb'
 
 class Enemy < Rectangle
   attr_reader :images
 
+  ##
+  # Creates a new enemy
+  #
+  # Positioned at (x, y) and with the given width and height
   def initialize x, y, width, height, images
     super x, y, width, height
     @images = images
@@ -19,6 +22,7 @@ class Enemy < Rectangle
   def update level
   end
 
+  ##
   # draw the image or if an array, the first image of the array
   def draw size, x_offset, y_offset
     px = @x * size
@@ -28,8 +32,9 @@ class Enemy < Rectangle
     image.draw(px - x_offset, py - y_offset, 0, size, size)
   end
 
-  # check if the enemy will kill you or not
-  # default is not harmless
+  ##
+  # check if the enemy will kill the player
+  # default is not harmless - if the player intersects the enemy they will die
   def harmless?
     false
   end
