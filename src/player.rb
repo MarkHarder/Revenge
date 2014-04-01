@@ -62,8 +62,7 @@ class Player < Rectangle
     @shoot_anim = 0
     @shoot_toggle = :peaceful
   end
-
-  ##
+   ##
   # Update the player based on direction and action
   def update level
     # die if you touch an enemy
@@ -127,16 +126,7 @@ class Player < Rectangle
         end
       end
     end
-    # If 's' is pressed, shoot
-    if @window.button_down? Gosu::KbS and Gosu.milliseconds-@shoot_start_milliseconds > SHOOT_TIME
-      @shoot_anim = 11 if (@action == :falling or
-                            @action == :jumping or
-                            @action == :pogo_falling or
-                            @action == :pogoing or
-                            @action == :pogo_jumping)
-      @action = :falling
-      shoot()
-    end
+    
     if @shoot_toggle == :violent
       @blast.each do |b|
         b.update level
@@ -400,7 +390,7 @@ class Player < Rectangle
       else
         #@shoot_toggle = :peaceful
       end
-      @blast.each {|b| b.draw(size)}
+      @blast.each {|b| b.draw(size, @x*size, @y*size)}
     elsif @shoot_toggle == :peaceful
       @shoot_anim = 0
     end
@@ -417,7 +407,7 @@ class Player < Rectangle
       else
         #@shoot_toggle = :peaceful
       end
-      @blast.each {|b| b.draw(size)}
+      @blast.each {|b| b.draw(size, @x*size, @y*size)}
     elsif @shoot_toggle == :peaceful
       @shoot_anim = 0
     end
@@ -427,6 +417,12 @@ class Player < Rectangle
   end
 
   def shoot
+    @shoot_anim = 11 if (@action == :falling or
+                            @action == :jumping or
+                            @action == :pogo_falling or
+                            @action == :pogoing or
+                            @action == :pogo_jumping)
+      @action = :falling
     #Replace 3 with SCALE value
     @blast ||= []
     @blast.push(Blast.new(@window, @direction, @x*3, @y*3, WIDTH))
@@ -484,3 +480,4 @@ class Player < Rectangle
     end
   end
 end
+

@@ -50,6 +50,8 @@ class Game < Gosu::Window
       close
     elsif id == Gosu::KbLeftAlt
       @player.toggle_pogo
+    elsif id == Gosu::KbSpace  
+      @player.shoot
     end
   end
 

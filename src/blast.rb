@@ -43,8 +43,6 @@ class Blast < Rectangle
   end
   
   def update level
-    @x = 0 if @x <= 0
-    @x = @window.width-30 if @x > @window.width-30
     # Kill can only be true for one frame
     @kill = false if @kill
     # Check the state of the blast
@@ -76,7 +74,6 @@ class Blast < Rectangle
             end
           end
         end
-        can_right = false if @x > @window.width-(WIDTH+SPEED)
         if !can_right
           @state = :collision
           @start_milliseconds = Gosu.milliseconds
@@ -102,7 +99,6 @@ class Blast < Rectangle
             end
           end
         end
-        can_left = false if @x <= 0
         if !can_left
           @state = :collision
           @start_milliseconds = Gosu.milliseconds
@@ -117,7 +113,9 @@ class Blast < Rectangle
     end
   end
 
-  def draw size
+  def draw size, x_offset, y_offset
+    x_offset -= 470
+    y_offset -= 330
     if @state == :initial
       @image = @sprites[0]
       @state = :moving
@@ -133,7 +131,7 @@ class Blast < Rectangle
       @image = @sprites[0] if @direction == :right
       @image = @sprites[8] if @direction == :left
     end
-    @image.draw(@x, @y, 4, size, size)
+    @image.draw(@x-x_offset, @y-y_offset, 4, size, size)
   end
   
   def finished?
