@@ -58,9 +58,9 @@ class Player < Rectangle
     @bounce_start_milliseconds = 0
     @shoot_start_milliseconds = 0
     #@shoot_anim: 0-9 == standing, 11-20 == jumping/falling/pogoing, other == peaceful
-    #@shoot_anim only takes effect when in :violent mode
+    #@shoot_anim only takes effect when in true mode
     @shoot_anim = 0
-    @shoot_toggle = :peaceful
+    @isViolent = false
   end
    ##
   # Update the player based on direction and action
@@ -117,7 +117,7 @@ class Player < Rectangle
 
     # ~shooting
     #if a blast kills an enemy, increase kill count
-    if @shoot_toggle == :violent
+    if @isViolent == true
       @blast.each do |b|
         if b.kill
           @kills += 1
@@ -127,7 +127,7 @@ class Player < Rectangle
       end
     end
     
-    if @shoot_toggle == :violent
+    if defined? @blast
       @blast.each do |b|
         b.update level
         #Check if all blasts have finished
@@ -135,8 +135,12 @@ class Player < Rectangle
           @blast.delete(b)
         end
       end
+      @blast.each do |b|
+        @isViolent = false if b.state == :finished
+      end
+        
       if @blast.empty?
-        @shoot_toggle = :peaceful
+        @isViolent = false
       end
     end
 
@@ -377,7 +381,7 @@ class Player < Rectangle
 
     # ~shooting
     # if player is shooting
-    if (@shoot_toggle == :violent and @direction == :right)
+    if (@isViolent == true and @direction == :right)
       case @shoot_anim
       when 0..9
         #On the ground
@@ -388,13 +392,12 @@ class Player < Rectangle
         image = @sprites[17]
         @shoot_anim += 1
       else
-        #@shoot_toggle = :peaceful
+        @isViolent = false
       end
-      @blast.each {|b| b.draw(size, @x*size, @y*size)}
-    elsif @shoot_toggle == :peaceful
+    elsif @isViolent == false
       @shoot_anim = 0
     end
-    if (@shoot_toggle == :violent and @direction == :left)
+    if (@isViolent == true and @direction == :left)
       case @shoot_anim
       when 0..9
         #On the ground
@@ -405,11 +408,15 @@ class Player < Rectangle
         image = @sprites[25]
         @shoot_anim += 1
       else
-        #@shoot_toggle = :peaceful
+        @isViolent = false
       end
-      @blast.each {|b| b.draw(size, @x*size, @y*size)}
-    elsif @shoot_toggle == :peaceful
+    elsif @isViolent == false
       @shoot_anim = 0
+    end
+    
+    #if any bullets exist, draw them
+    if defined?(@blast)
+      @blast.each {|b| b.draw(size, @x*size, @y*size)}
     end
 
     # draw the image scaled to size
@@ -427,7 +434,7 @@ class Player < Rectangle
     @blast ||= []
     @blast.push(Blast.new(@window, @direction, @x*3, @y*3, WIDTH))
     @bullets -= 1
-    @shoot_toggle = :violent
+    @isViolent = true
     @shoot_start_milliseconds = Gosu.milliseconds
   end
 

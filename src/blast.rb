@@ -11,7 +11,7 @@ class Blast < Rectangle
   SPEED = 10
   SCALE = 3
   EXPLOSION_TIME = 240
-  attr_reader :kill
+  attr_reader :kill, :state
   
   def initialize(window, direction, x, y, offset)
     super(x, y, WIDTH, HEIGHT)
