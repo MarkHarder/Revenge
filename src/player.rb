@@ -14,24 +14,31 @@ class Player < Rectangle
   # The height of the player in pixels
   HEIGHT = 32
   ##
-  # The amount of time the player moves upwards during a jump
-  JUMP_TIME = 800
+  # The player speed
+  SPEED = 2
   ##
-  # The amount of time the player moves upwards during a pogo bounce
-  POGO_TIME = 1200
+  # The amount of velocity the player moves upwards during a jump
+  JUMP_VELOCITY = -5
+  ##
+  # The amount of velocity the player moves upwards during a pogo bounce
+  POGO_VELOCITY = -8
   ##
   # The amount of time the bounce animation when the player hits the ground
   # on a pogo stick
   BOUNCE_TIME = 200
   ##
-  # The amount of time the player moves upwards when dying
-  DEATH_TIME = 2400
+  # The force of gravity
+  ACCELERATION = 0.2
+
+  ##
+  # The amount of velocity the player moves upwards when dying
+  DEATH_VELOCITY = -6
   ##
   # The amount of time it takes to do a pullup
   PULLUP_TIME = 400
   ##
   # The amount of time you hang on a cliff before you can move
-  HANG_TIME = 1000
+  HANG_TIME = 800
   SHOOT_TIME = 300
 
   ##
@@ -47,6 +54,7 @@ class Player < Rectangle
     @kills = 0
     @bullets = 100
     @lives = 3
+    @velocity = 1
 
     @sprites = Gosu::Image::load_tiles(window, "media/PlayerSprites.png", WIDTH, HEIGHT, true)
     @pullup = Gosu::Image::load_tiles(window, "media/Pullup.png", 25, 80, true)
@@ -62,7 +70,8 @@ class Player < Rectangle
     @shoot_anim = 0
     @isViolent = false
   end
-   ##
+
+  ##
   # Update the player based on direction and action
   def update level
     # die if you touch an enemy
@@ -87,16 +96,15 @@ class Player < Rectangle
     # time <  DEATH_TIME / 6 :: player moves up
     # time >= DEATH_TIME / 6 :: player moves down
     if @action == :dying
-      elapsed_time = Gosu.milliseconds - @action_start_milliseconds
-      if elapsed_time >= DEATH_TIME
+      if @velocity > 10
         if @lives >= 0
           restart
         else
           level.quit
         end
       end
-      @y -= 1 if elapsed_time < DEATH_TIME / 6
-      @y += 1 if elapsed_time >= DEATH_TIME / 6
+      @y += @velocity
+      @velocity += ACCELERATION
 
       # return to prevent other actions while dying
       return
@@ -149,7 +157,7 @@ class Player < Rectangle
     if @window.button_down? Gosu::KbLeftControl
       if @action == :none
         @action = :jumping
-        @action_start_milliseconds = Gosu.milliseconds
+        @velocity = JUMP_VELOCITY
       end
     elsif @action == :jumping
       @action = :falling
@@ -158,26 +166,19 @@ class Player < Rectangle
     # check to see if the player hits a ceiling while jumping
     # either while jumping or pogoing
     if @action == :jumping
-      up_rect = Rectangle.new(@x, @y - 1, @width, @height)
+      up_rect = Rectangle.new(@x, @y + @velocity, @width, @height)
       for p in level.platforms do
         @action = :falling if up_rect.intersect?(p)
       end
-      @action = :falling if Gosu.milliseconds - @action_start_milliseconds >= JUMP_TIME
-      @y -= 1 if @action == :jumping
+      @velocity = 0 if @action == :falling
     elsif @action == :pogoing
-      up_rect = Rectangle.new(@x, @y - 1, @width, @height)
+      up_rect = Rectangle.new(@x, @y + @velocity, @width, @height)
       for p in level.platforms do
-        @action = :pogo_falling if up_rect.intersect?(p)
+        if up_rect.intersect?(p)
+          @action = :pogo_falling 
+        end
       end
-      @action = :pogo_falling if Gosu.milliseconds - @action_start_milliseconds >= POGO_TIME
-      @y -= 1 unless @action == :pogo_falling
-    elsif @action == :pogo_jumping
-      up_rect = Rectangle.new(@x, @y - 1, @width, @height)
-      for p in level.platforms do
-        @action = :falling if up_rect.intersect?(p)
-      end
-      @action = :falling if Gosu.milliseconds - @action_start_milliseconds >= POGO_TIME
-      @y -= 1 unless @action == :falling
+      @velocity = ACCELERATION if @action == :pogo_falling
     end
 
     # move the player right and left when arrow keys are pressed
@@ -186,11 +187,11 @@ class Player < Rectangle
       # create a rectangle just to the right of the player and check
       #   if it overlaps with any of the platforms
       can_right = true
-      right_rect = Rectangle.new(@x + 1, @y, @width, @height)
+      right_rect = Rectangle.new(@x + SPEED, @y, @width, @height)
       for p in level.platforms do
         can_right = false if right_rect.intersect?(p)
       end
-      @x += 1 if can_right
+      @x += SPEED if can_right
 
 
       # check if you can grab onto a ledge
@@ -230,11 +231,11 @@ class Player < Rectangle
       # create a rectangle just to the left of the player and check
       #   if it overlaps with any of the platforms
       can_left = true
-      left_rect = Rectangle.new(@x - 1, @y, @width, @height)
+      left_rect = Rectangle.new(@x - SPEED, @y, @width, @height)
       for p in level.platforms do
         can_left = false if left_rect.intersect?(p)
       end
-      @x -= 1 if can_left
+      @x -= SPEED if can_left
 
       # grab onto a ledge if it is there
       if @action == :falling || @action == :jumping
@@ -269,20 +270,22 @@ class Player < Rectangle
     # if there is a platform and the player is pogoing, they bounce back up
     # if there is a platform and they are falling, stop them
     @action = :falling if @action == :none
-    fall_rect = Rectangle.new(@x, @y + 1, @width, @height)
+    fall_rect = Rectangle.new(@x, @y + @velocity, @width, @height)
     for p in level.platforms do
       if fall_rect.intersect?(p)
-        if @action == :falling
-          @action = :none 
-        elsif @action == :pogo_falling
-          @action = :pogoing 
+        if @action == :pogo_falling || @action == :pogoing
+          @velocity = POGO_VELOCITY
+          @action = :pogoing
           @bounce_start_milliseconds = Gosu.milliseconds
-          @action_start_milliseconds = Gosu.milliseconds
-          @action_start_milliseconds += 400 if @window.button_down? Gosu::KbLeftControl
+        else
+          @action = :none 
+          @y = p.y - HEIGHT
         end
       end
     end
-    @y += 1 if @action == :falling || @action == :pogo_falling
+    @y += @velocity unless @action == :none || @action == :hang || @action == :pullup
+    @velocity += ACCELERATION
+    @velocity = 4 if @velocity > 4
   end
 
   ##
@@ -443,23 +446,18 @@ class Player < Rectangle
   # Change the player's action based on its current state
   def toggle_pogo
     # down with stick :: down without stick
-    if @action == :pogo_falling
-      @action = :falling
     # up with stick :: up without stick
-    elsif @action == :pogoing
-      @action = :pogo_jumping
-    # up without stick :: up with stick
-    elsif @action == :pogo_jumping
-      @action = :pogoing
+    if @action == :pogoing || @action == :pogo_falling
+      @action = :falling
+    elsif @action == :falling
+      @action = :pogo_falling
     # (none, down, up) without stick :: down with stick
-    elsif @action == :none || @action == :falling || @action == :jumping
-      if @action == :none
-        @bounce_start_milliseconds = Gosu.milliseconds
-        @action_start_milliseconds = Gosu.milliseconds
-        @action_start_milliseconds += 400 if @window.button_down? Gosu::KbLeftControl
-      else
-        @action_start_milliseconds = -POGO_TIME
-      end
+    elsif @action == :none
+      @action = :pogoing
+      @velocity = POGO_VELOCITY
+      @bounce_start_milliseconds = Gosu.milliseconds
+      @velocity -= 1 if @window.button_down? Gosu::KbLeftControl
+    elsif @action != :dying
       @action = :pogoing
     end
   end
@@ -483,7 +481,7 @@ class Player < Rectangle
     if @action != :dying
       @lives -= 1
       @action = :dying
-      @action_start_milliseconds = Gosu.milliseconds
+      @velocity = DEATH_VELOCITY
     end
   end
 end
