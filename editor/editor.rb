@@ -9,6 +9,7 @@ require_relative '../src/soda.rb'
 require_relative '../src/gum.rb'
 require_relative '../src/chocolate.rb'
 require_relative '../src/slug.rb'
+require_relative '../src/mushroom.rb'
 require_relative '../src/spikes.rb'
 
 class Editor < Gosu::Window
@@ -172,7 +173,9 @@ class Editor < Gosu::Window
         @current_selection = :gum
       end
     elsif id == Gosu::Kb3
-      if @current_type == :candies
+      if @current_type == :enemies
+        @current_selection = :mushroom
+      elsif @current_type == :candies
         @current_selection = :chocolate
       end
     elsif id == Gosu::MsLeft
@@ -195,6 +198,15 @@ class Editor < Gosu::Window
         x += 32 * @x_offset
         y += 25 * @y_offset
         @enemies.push(Spikes.new(self, x, y))
+      elsif @current_selection == :mushroom
+        x = (mouse_x / SCALE).to_i
+        x -= x % 32
+        y = (mouse_y / SCALE).to_i
+        y -= y % 25
+        y += 6
+        x += 32 * @x_offset
+        y += 25 * @y_offset
+        @enemies.push(Mushroom.new(self, x, y))
       elsif @current_type == :candies
         x = (mouse_x / SCALE).to_i
         y = (mouse_y / SCALE).to_i

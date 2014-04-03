@@ -39,7 +39,7 @@ class Game < Gosu::Window
 
     @menu_selection = 0
 
-    @in_menu = true
+    @state = :menu
     @paused = false
   end
 
@@ -47,7 +47,7 @@ class Game < Gosu::Window
   # Update the logic of the game by updating the player
   # and each component of the level
   def update
-    unless @in_menu
+    if @state == :game
       @player.update @level
       @level.update
     end
@@ -56,14 +56,16 @@ class Game < Gosu::Window
   ##
   # draw the components of the game, the player and each element of the level
   def draw
-   if @in_menu
+   if @state == :menu
      i = 0
      for option in @menu_options
        color = option == @menu_options[@menu_selection] ? LIGHT_GREEN : DARK_GREEN
        Gosu::Image.from_text(self, option.to_s, "Times New Roman", 24 * SCALE).draw(100 * SCALE, 50 * i * SCALE + 30 * SCALE, 0, 1, 1, color)
        i += 1
      end
-   else
+   elsif @state == :instructions
+       Gosu::Image.from_text(self, "Use the arrow keys to move the player left and right.\nPress control to jump.\nAlt to toggle the pogo stick.\nSpace to shoot.\n\nCollect candy.\nAvoid enemies.\nGame over if you run out of lives.", "Times New Roman", 12 * SCALE, 10 * SCALE, 250 * SCALE, :left).draw(50 * SCALE, 25 * SCALE, 0, 1, 1, 0xffffffff)
+   elsif @state == :game
       @level.draw SCALE, @player.x * SCALE, @player.y * SCALE
       @player.draw SCALE
     end
@@ -77,10 +79,12 @@ class Game < Gosu::Window
     if id == Gosu::KbQ
       close
     elsif id == Gosu::KbEscape
-      if @in_menu
+      if @state == :menu
         close
+      elsif @state == :instructions
+        @state = :menu
       else
-        @in_menu = true
+        @state = :menu
         @paused = true
       end
     elsif id == Gosu::KbLeftAlt
@@ -94,11 +98,13 @@ class Game < Gosu::Window
       @menu_selection += @menu_options.size - 1
       @menu_selection %= @menu_options.size
     elsif id == Gosu::KbReturn
-      if @in_menu
+      if @state == :menu
         if @menu_options[@menu_selection] == :Play || @menu_options[@menu_selection] == :Resume
           @menu_options[@menu_selection] = :Resume
-          @in_menu = false
+          @state = :game
           @paused = true
+        elsif @menu_options[@menu_selection] == :Instructions
+          @state = :instructions
         elsif @menu_options[@menu_selection] == :Quit
           close
         end
