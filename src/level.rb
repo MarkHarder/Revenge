@@ -1,6 +1,7 @@
 #enemies
 require_relative 'slug.rb'
 require_relative 'spikes.rb'
+require_relative 'mushroom.rb'
 #candies
 require_relative 'soda.rb'
 require_relative 'gum.rb'
