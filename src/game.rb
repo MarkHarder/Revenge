@@ -91,7 +91,8 @@ class Game < Gosu::Window
       @menu_selection %= @menu_options.size
     elsif id == Gosu::KbReturn
       if @in_menu
-        if @menu_options[@menu_selection] == :Play
+        if @menu_options[@menu_selection] == :Play || @menu_options[@menu_selection] == :Resume
+          @menu_options[@menu_selection] = :Resume
           @in_menu = false
           @paused = true
         elsif @menu_options[@menu_selection] == :Quit
