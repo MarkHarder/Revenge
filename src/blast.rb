@@ -1,18 +1,28 @@
-# Stephen Quenzer
-# Mark Harder
-# ----------
-# A class to store information about shooting
-
 require_relative 'rectangle.rb'
 
 class Blast < Rectangle
+  attr_reader :kill, :state, :collisionWith
+  ##
+  # The width of the blast in pixels
   WIDTH = 14
+  ##
+  # The height of the player in pixels
   HEIGHT = 16
+  ##
+  #The blast speed
   SPEED = 10
+  ##
+  #The scale of the window for correct positioning of blast
   SCALE = 3
+  ##
+  # Layer of blast in comparison to environment
+  Z_LEVEL = 4
+  ##
+  # The animation time for an explosion
   EXPLOSION_TIME = 240
-  attr_reader :kill, :state
   
+  ##
+  # Create a new blast 
   def initialize(window, direction, x, y, offset)
     super(x, y, WIDTH, HEIGHT)
     @window = window
@@ -24,27 +34,28 @@ class Blast < Rectangle
     else
       @x = x+offset
     end
-    @y = y
+    @y = y+10
     
+    ##Possible states:
+    # :Initial - First couple frames of animation
+    # :Moving - While blast is moving through the air
+    # :Collision - When blast hits something
+    # :Finished - After blast has finished exploding
+    @state = :initial
+    
+    # Holds the class name of the element that was collided against
     @collisionWith = :none
     @kill = false
-    
-    #Possible states:
-    ## :Initial - First couple frames of animation
-    ## :Moving - While blast is moving through the air
-    ## :Collision - When blast hits something
-    ## :Finished - After blast has finished exploding
-    @state = :initial
     @start_milliseconds = 0
   end
   
-  def collisionWith
-    @collisionWith
-  end
-  
-  def update level
+    ##
+    # Update the blast animation based on direction
+    # whether it has collided with anything
+    def update level
     # Kill can only be true for one frame
     @kill = false if @kill
+
     # Check the state of the blast
     if @state == :initial
     elsif @state == :moving
@@ -109,18 +120,17 @@ class Blast < Rectangle
         @state = :finished
       end
     else
-      #@state == :finished
     end
   end
 
   def draw size, x_offset, y_offset
+    # Offset blast to account for environment moving around player
     x_offset -= 470
     y_offset -= 330
     if @state == :initial
       @image = @sprites[0]
       @state = :moving
     elsif @state == :moving
-      # Does animating this way cycle through the sprites from a random starting place?
         @image = @sprites[(Gosu::milliseconds / 60 % 4) + 1] if @direction == :right
         @image = @sprites[(Gosu::milliseconds / 60 % 4) + 9] if @direction == :left
     elsif @state == :collision
@@ -131,7 +141,7 @@ class Blast < Rectangle
       @image = @sprites[0] if @direction == :right
       @image = @sprites[8] if @direction == :left
     end
-    @image.draw(@x-x_offset, @y-y_offset, 4, size, size)
+    @image.draw(@x-x_offset, @y-y_offset, Z_LEVEL, size, size)
   end
   
   def finished?
