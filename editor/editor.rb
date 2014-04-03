@@ -6,6 +6,8 @@
 require 'gosu'
 
 require_relative '../src/soda.rb'
+require_relative '../src/gum.rb'
+require_relative '../src/chocolate.rb'
 require_relative '../src/slug.rb'
 require_relative '../src/spikes.rb'
 
@@ -61,6 +63,7 @@ class Editor < Gosu::Window
       :spikes => Spikes.new(self, 0, 0).images[0],
     }
 
+    @current_type = :terrain
     @current_selection = :background
     @x_offset = 0
     @y_offset = 0
@@ -129,6 +132,8 @@ class Editor < Gosu::Window
     for candy in @candies do
       candy.draw SCALE, @x_offset * 32 * SCALE, @y_offset * 25 * SCALE
     end
+
+    Gosu::Image.from_text(self, @current_selection.to_s, "Times New Roman", 24).draw(5, 5, 0, 1, 1, 0xffffffff)
   end
 
   # method called when a button is pressed
@@ -136,6 +141,12 @@ class Editor < Gosu::Window
     if id == Gosu::KbEscape || id == Gosu::KbQ
       save
       close
+    elsif id == Gosu::KbA
+      @current_type = :terrain
+    elsif id == Gosu::KbS
+      @current_type = :enemies
+    elsif id == Gosu::KbD
+      @current_type = :candies
     elsif id == Gosu::KbLeft || id == Gosu::GpLeft
       @x_offset -= 1 if @x_offset > 0
     elsif id == Gosu::KbUp || id == Gosu::GpUp
@@ -145,15 +156,25 @@ class Editor < Gosu::Window
     elsif id == Gosu::KbDown || id == Gosu::GpDown
       @y_offset += 1 if @y_offset < LEVEL_HEIGHT - 10
     elsif id == Gosu::Kb1
-      @current_selection = :background
+      if @current_type == :terrain
+        @current_selection = :background
+      elsif @current_type == :enemies
+        @current_selection = :slug
+      elsif @current_type == :candies
+        @current_selection = :soda
+      end
     elsif id == Gosu::Kb2
-      @current_selection = :platform
+      if @current_type == :terrain
+        @current_selection = :platform
+      elsif @current_type == :enemies
+        @current_selection = :spikes
+      elsif @current_type == :candies
+        @current_selection = :gum
+      end
     elsif id == Gosu::Kb3
-      @current_selection = :slug
-    elsif id == Gosu::Kb4
-      @current_selection = :spikes
-    elsif id == Gosu::Kb5
-      @current_selection = :soda
+      if @current_type == :candies
+        @current_selection = :chocolate
+      end
     elsif id == Gosu::MsLeft
       if @current_selection == :slug
         x = (mouse_x / SCALE).to_i
@@ -174,12 +195,12 @@ class Editor < Gosu::Window
         x += 32 * @x_offset
         y += 25 * @y_offset
         @enemies.push(Spikes.new(self, x, y))
-      elsif @current_selection == :soda
+      elsif @current_type == :candies
         x = (mouse_x / SCALE).to_i
         y = (mouse_y / SCALE).to_i
         x += 32 * @x_offset
         y += 25 * @y_offset
-        @candies.push(Soda.new(self, x, y))
+        @candies.push(Object.const_get(@current_selection.to_s.capitalize).new(self, x, y))
       end
     end
   end

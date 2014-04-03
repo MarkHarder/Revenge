@@ -3,6 +3,8 @@ require_relative 'slug.rb'
 require_relative 'spikes.rb'
 #candies
 require_relative 'soda.rb'
+require_relative 'gum.rb'
+require_relative 'chocolate.rb'
 
 require_relative 'rectangle.rb'
 
