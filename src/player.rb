@@ -179,6 +179,13 @@ class Player < Rectangle
         end
       end
       @velocity = ACCELERATION if @action == :pogo_falling
+    elsif @action == :falling && @velocity < 0
+      up_rect = Rectangle.new(@x, @y + @velocity, @width, @height)
+      for p in level.platforms do
+        if up_rect.intersect?(p)
+          @velocity = ACCELERATION
+        end
+      end
     end
 
     # move the player right and left when arrow keys are pressed
@@ -282,7 +289,7 @@ class Player < Rectangle
           @velocity = POGO_VELOCITY
           @action = :pogoing
           @bounce_start_milliseconds = Gosu.milliseconds
-        else
+        elsif @velocity >= 0
           @action = :none 
           @y = p.y - HEIGHT
         end
