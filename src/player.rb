@@ -21,7 +21,10 @@ class Player < Rectangle
   JUMP_VELOCITY = -5
   ##
   # The amount of velocity the player moves upwards during a pogo bounce
-  POGO_VELOCITY = -8
+  POGO_VELOCITY = -4
+  ##
+  # Higher pogo bounce velocity
+  SUPER_POGO_VELOCITY = -8
   ##
   # The amount of time the bounce animation when the player hits the ground
   # on a pogo stick
@@ -286,7 +289,11 @@ class Player < Rectangle
     for p in level.platforms do
       if fall_rect.intersect?(p)
         if @action == :pogo_falling || @action == :pogoing
-          @velocity = POGO_VELOCITY
+          if @window.button_down? Gosu::KbLeftControl
+            @velocity = SUPER_POGO_VELOCITY
+          else
+            @velocity = POGO_VELOCITY
+          end
           @action = :pogoing
           @bounce_start_milliseconds = Gosu.milliseconds
         elsif @velocity >= 0
