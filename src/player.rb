@@ -214,8 +214,8 @@ class Player < Rectangle
         grab_rect = Rectangle.new(@x + @width, @y, 5, 5)
         for p in level.platforms do
           ledge_rect = Rectangle.new(p.x - 2, p.y - 2, 5, 5)
-          if ledge_rect.intersect?(grab_rect)
-           hang = true
+          if ledge_rect.intersect?(grab_rect) && @velocity >= 0
+            hang = true
             @y = p.y
           end
         end
@@ -254,16 +254,16 @@ class Player < Rectangle
 
       # grab onto a ledge if it is there
       if @action == :falling || @action == :jumping
-        pullup = false
+        hang = false
         grab_rect = Rectangle.new(@x - 5, @y, 5, 5)
         for p in level.platforms do
           ledge_rect = Rectangle.new(p.x + p.width - 3, p.y - 2, 5, 5)
-          if ledge_rect.intersect?(grab_rect)
-            pullup = true
+          if ledge_rect.intersect?(grab_rect) && @velocity >= 0
+            hang = true
             @y = p.y
           end
         end
-        if pullup
+        if hang
           @hang_direction = :left
           @action = :hang
           @action_start_milliseconds = Gosu.milliseconds
