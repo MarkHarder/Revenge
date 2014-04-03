@@ -46,8 +46,8 @@ class Player < Rectangle
   def initialize window
     super(@x, @y, WIDTH - 20, HEIGHT - 4)
 
-    @x = 20
-    @y = 20
+    @x = 10
+    @y = 10
     @direction = :right
     @hang_direction = :none
     @score = 0
