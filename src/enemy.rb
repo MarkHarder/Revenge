@@ -16,6 +16,8 @@ class Enemy < Rectangle
   def initialize x, y, width, height, images
     super x, y, width, height
     @images = images
+
+    @harmless = false
   end
 
   # basic update loop, override in specific enemy classes
@@ -36,6 +38,6 @@ class Enemy < Rectangle
   # check if the enemy will kill the player
   # default is not harmless - if the player intersects the enemy they will die
   def harmless?
-    false
+    @harmless
   end
 end
