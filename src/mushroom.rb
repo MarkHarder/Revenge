@@ -47,7 +47,6 @@ class Mushroom < Enemy
         end
         @bounce_cycle += 1
         @bounce_cycle %= 9
-        p @bounce_cycle
       end
     end
 
