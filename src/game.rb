@@ -77,8 +77,12 @@ class Game < Gosu::Window
     if id == Gosu::KbQ
       close
     elsif id == Gosu::KbEscape
-      @in_menu = true
-      @paused = true
+      if @in_menu
+        close
+      else
+        @in_menu = true
+        @paused = true
+      end
     elsif id == Gosu::KbLeftAlt
       @player.toggle_pogo
     elsif id == Gosu::KbSpace  

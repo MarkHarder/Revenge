@@ -183,10 +183,13 @@ class Player < Rectangle
 
     # move the player right and left when arrow keys are pressed
     if @window.button_down? Gosu::KbRight or @window.button_down? Gosu::GpRight
+      return if @action == :pullup # can't move if you are doing a pullup
+
       # check if there is room to move right
       # create a rectangle just to the right of the player and check
       #   if it overlaps with any of the platforms
       can_right = true
+      can_right = false if @action == :pullup
       right_rect = Rectangle.new(@x + SPEED, @y, @width, @height)
       for p in level.platforms do
         can_right = false if right_rect.intersect?(p)
@@ -227,6 +230,8 @@ class Player < Rectangle
       @direction = :right
     # same for the left direction
     elsif @window.button_down? Gosu::KbLeft or @window.button_down? Gosu::GpLeft
+      return if @action == :pullup # can't move if you are doing a pullup
+
       # check if there is room to move left
       # create a rectangle just to the left of the player and check
       #   if it overlaps with any of the platforms
