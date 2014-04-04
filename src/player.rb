@@ -42,6 +42,9 @@ class Player < Rectangle
   ##
   # The amount of time you hang on a cliff before you can move
   HANG_TIME = 800
+  ##
+  # cooldown of the sprint feature
+  SPRINT_COOLDOWN = 1600
   SHOOT_TIME = 300
 
   ##
@@ -68,6 +71,7 @@ class Player < Rectangle
     @action_start_milliseconds = 0
     @bounce_start_milliseconds = 0
     @shoot_start_milliseconds = 0
+    @sprint_time = 0
     #@shoot_anim: 0-9 == standing, 11-20 == jumping/falling/pogoing, other == peaceful
     #@shoot_anim only takes effect when in true mode
     @shoot_anim = 0
@@ -501,6 +505,47 @@ class Player < Rectangle
       @lives -= 1
       @action = :dying
       @velocity = DEATH_VELOCITY
+    end
+  end
+
+  ##
+  # sprinting moves the player through enemies without dying
+  def sprint level
+    return if @action == :hang || @action == :pullup
+    return if Gosu.milliseconds - @sprint_time <= SPRINT_COOLDOWN
+
+    @sprint_time = Gosu.milliseconds
+
+    if @direction == :right
+      i = 0
+      while i < 80
+        can_right = true
+        right_rect = Rectangle.new(@x + 1, @y, @width, @height)
+        for p in level.platforms do
+          can_right = false if right_rect.intersect?(p)
+        end
+        if can_right
+          @x += 1
+        else
+          i = 80
+        end
+        i += 1
+      end
+    elsif @direction == :left
+      i = 0
+      while i < 80
+        can_left = true
+        left_rect = Rectangle.new(@x - 1, @y, @width, @height)
+        for p in level.platforms do
+          can_left = false if left_rect.intersect?(p)
+        end
+        if can_left
+          @x -= 1
+        else
+          i = 80
+        end
+        i += 1
+      end
     end
   end
 end

@@ -88,15 +88,27 @@ class Game < Gosu::Window
         @paused = true
       end
     elsif id == Gosu::KbLeftAlt
-      @player.toggle_pogo
+      if @state == :game
+        @player.toggle_pogo
+      end
+    elsif id == Gosu::KbLeftShift
+      if @state == :game
+        @player.sprint @level
+      end
     elsif id == Gosu::KbSpace  
-      @player.shoot
+      if @state == :game
+        @player.shoot
+      end
     elsif id == Gosu::KbDown || id == Gosu::GpDown
-      @menu_selection += 1
-      @menu_selection %= @menu_options.size
+      if @state == :menu
+        @menu_selection += 1
+        @menu_selection %= @menu_options.size
+      end
     elsif id == Gosu::KbUp || id == Gosu::GpUp
-      @menu_selection += @menu_options.size - 1
-      @menu_selection %= @menu_options.size
+      if @state == :menu
+        @menu_selection += @menu_options.size - 1
+        @menu_selection %= @menu_options.size
+      end
     elsif id == Gosu::KbReturn
       if @state == :menu
         if @menu_options[@menu_selection] == :Play || @menu_options[@menu_selection] == :Resume
