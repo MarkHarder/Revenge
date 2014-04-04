@@ -60,6 +60,7 @@ class Player < Rectangle
     @kills = 0
     @bullets = 100
     @lives = 3
+    @next_new_life = 1000
     @velocity = 1
 
     @sprites = Gosu::Image::load_tiles(window, "media/PlayerSprites.png", WIDTH, HEIGHT, true)
@@ -92,6 +93,10 @@ class Player < Rectangle
       if intersect?(candy)
         @score += candy.value
         level.candies.delete(candy)
+        if @score >= @next_new_life
+          @lives += 1
+          @next_new_life *= 2
+        end
       end
     end
 
