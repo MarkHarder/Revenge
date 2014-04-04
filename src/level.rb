@@ -88,7 +88,7 @@ class Level
   # Update all the enemies
   def update
     for enemy in @enemies do
-      enemy.update self
+      enemy.update
     end
   end
 

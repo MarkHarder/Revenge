@@ -16,6 +16,6 @@ class Spikes < Enemy
   def initialize window, x, y
     images = Gosu::Image::load_tiles(window, "media/Spikes.png", WIDTH, HEIGHT, true)
 
-    super(x, y, WIDTH, HEIGHT, images)
+    super(window, x, y, WIDTH, HEIGHT, images)
   end
 end

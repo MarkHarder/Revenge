@@ -52,7 +52,7 @@ class Blast < Rectangle
     ##
     # Update the blast animation based on direction
     # whether it has collided with anything
-    def update level
+    def update
     # Kill can only be true for one frame
     @kill = false if @kill
 
@@ -73,14 +73,14 @@ class Blast < Rectangle
         can_right = true
         right_rect = Rectangle.new(@x/SCALE, @y/SCALE, @width, @height)
         #check platforms for collision
-        level.platforms.each {|p| can_right = false if right_rect.intersect?(p)}
+        @window.level.platforms.each {|p| can_right = false if right_rect.intersect?(p)}
         #check enemies for collision
-        level.enemies.each do |e|
+        @window.level.enemies.each do |e|
           if right_rect.intersect?(e)
             can_right = false
             #Recognize Enemy Types
             if e.class == Slug
-              level.enemies.delete(e)
+              @window.level.enemies.delete(e)
               @kill = true
             end
           end
@@ -98,14 +98,14 @@ class Blast < Rectangle
         can_left = true
         left_rect = Rectangle.new(@x/SCALE, @y/SCALE, @width, @height)
         #check platforms for collision
-        level.platforms.each {|p| can_left = false if left_rect.intersect?(p)}
+        @window.level.platforms.each {|p| can_left = false if left_rect.intersect?(p)}
         #check enemies for collision
-        level.enemies.each do |e|
+        @window.level.enemies.each do |e|
           if left_rect.intersect?(e)
             can_left = false
             #Recognize Enemy Types
             if e.class == Slug
-              level.enemies.delete(e) 
+              @window.level.enemies.delete(e) 
               @kill = true
             end
           end

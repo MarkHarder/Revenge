@@ -13,15 +13,16 @@ class Enemy < Rectangle
   # Creates a new enemy
   #
   # Positioned at (x, y) and with the given width and height
-  def initialize x, y, width, height, images
+  def initialize window, x, y, width, height, images
     super x, y, width, height
     @images = images
+    @window = window
 
     @harmless = false
   end
 
   # basic update loop, override in specific enemy classes
-  def update level
+  def update
   end
 
   ##

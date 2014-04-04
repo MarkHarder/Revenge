@@ -23,9 +23,8 @@ class Mushroom < Enemy
   def initialize window, x, y
     images = Gosu::Image::load_tiles(window, "media/Mushroom.png", 32, 32, true)
 
-    super(x, y, WIDTH, HEIGHT, images)
+    super(window, x, y, WIDTH, HEIGHT, images)
 
-    @window = window
     # direction the mushroom is facing
     @direction = :left
     @velocity = 0
@@ -35,9 +34,11 @@ class Mushroom < Enemy
 
   ##
   # Update the mushroom
-  def update level
+  def update
+    @direction = @window.player.x < @x ? :left : :right
+
     fall_rect = Rectangle.new(@x, @y + @velocity, @width, @height)
-    for p in level.platforms do
+    for p in @window.level.platforms do
       if fall_rect.intersect?(p)
         @y = p.y - HEIGHT
         if @bounce_cycle > 5

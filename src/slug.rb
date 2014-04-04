@@ -25,9 +25,8 @@ class Slug < Enemy
   def initialize window, x, y
     images = Gosu::Image::load_tiles(window, "media/SlugSprites.png", 23, 24, true)
 
-    super(x, y, WIDTH, HEIGHT, images)
+    super(window, x, y, WIDTH, HEIGHT, images)
 
-    @window = window
     # direction the slug is facing
     @direction = rand(2) == 0 ? :left : :right
 
@@ -40,14 +39,14 @@ class Slug < Enemy
 
   ##
   # Update the slug. Either move it or start place slime
-  def update level
+  def update
     if @action == :moving
       # random chance it will start droping slime
       if rand(20 * 60) == 0
         @action = :sliming
         @action_start_milliseconds = Gosu.milliseconds
         # add the slime
-        level.enemies.push(Slime.new(@window, @x, @y + @height))
+        @window.level.enemies.push(Slime.new(@window, @x, @y + @height))
       end
     end
 
@@ -67,7 +66,7 @@ class Slug < Enemy
       left_turn = Rectangle.new(@x - 1, @y + HEIGHT + 5, 5, 5)
       platform_turn = Rectangle.new(@x - 2, @y, 5, 5)
       can_turn = true
-      for p in level.platforms do
+      for p in @window.level.platforms do
         if left_turn.intersect?(p)
           can_turn = false
         end
@@ -85,7 +84,7 @@ class Slug < Enemy
       right_turn = Rectangle.new(@x + WIDTH + 1, @y + HEIGHT + 5, 5, 5)
       platform_turn = Rectangle.new(@x + WIDTH + 2, @y, 5, 5)
       can_turn = true
-      for p in level.platforms do
+      for p in @window.level.platforms do
         if right_turn.intersect?(p)
           can_turn = false
         end

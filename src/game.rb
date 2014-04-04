@@ -6,6 +6,8 @@ require_relative 'player.rb'
 # The main game engine
 
 class Game < Gosu::Window
+  attr_reader :player, :level
+
   ##
   # How much to scale the window by
   SCALE = 3
@@ -48,7 +50,7 @@ class Game < Gosu::Window
   # and each component of the level
   def update
     if @state == :game
-      @player.update @level
+      @player.update
       @level.update
     end
   end
@@ -93,7 +95,7 @@ class Game < Gosu::Window
       end
     elsif id == Gosu::KbLeftShift
       if @state == :game
-        @player.sprint @level
+        @player.sprint
       end
     elsif id == Gosu::KbSpace  
       if @state == :game

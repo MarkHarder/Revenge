@@ -21,16 +21,16 @@ class Slime < Enemy
   def initialize window, x, y
     images = Gosu::Image::load_tiles(window, "media/SlugSlime.png", WIDTH, HEIGHT, true)
 
-    super(x, y, WIDTH, HEIGHT, images)
+    super(window, x, y, WIDTH, HEIGHT, images)
 
     @creation_milliseconds = Gosu.milliseconds
   end
 
   ##
   # Check if the slime is harmless or if it disappears
-  def update level
+  def update
     if Gosu.milliseconds - @creation_milliseconds >= SLIME_TIME * 2
-      level.enemies.delete(self)
+      @window.level.enemies.delete(self)
     elsif Gosu.milliseconds - @creation_milliseconds >= SLIME_TIME
       @harmless = true
     end

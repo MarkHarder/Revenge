@@ -81,18 +81,18 @@ class Player < Rectangle
 
   ##
   # Update the player based on direction and action
-  def update level
+  def update
     # die if you touch an enemy
-    for enemy in level.enemies do
+    for enemy in @window.level.enemies do
       die if intersect?(enemy) && !enemy.harmless?
     end
 
     # collect a candy if you touch it
     # add the candy's score to the player's score
-    for candy in level.candies do
+    for candy in @window.level.candies do
       if intersect?(candy)
         @score += candy.value
-        level.candies.delete(candy)
+        @window.level.candies.delete(candy)
         if @score >= @next_new_life
           @lives += 1
           @next_new_life *= 2
@@ -101,7 +101,7 @@ class Player < Rectangle
     end
 
     #check if the player falls off the map
-    die if level.below_screen?(@y + @height)
+    die if @window.level.below_screen?(@y + @height)
 
     # dying animation
     # time == DEATHTIME :: player resets or quits
@@ -112,7 +112,7 @@ class Player < Rectangle
         if @lives >= 0
           restart
         else
-          level.quit
+          @window.level.quit
         end
       end
       @y += @velocity
@@ -149,7 +149,7 @@ class Player < Rectangle
     
     if defined? @blast
       @blast.each do |b|
-        b.update level
+        b.update
         #Check if all blasts have finished
         if b.finished?
           @blast.delete(b)
@@ -179,13 +179,13 @@ class Player < Rectangle
     # either while jumping or pogoing
     if @action == :jumping
       up_rect = Rectangle.new(@x, @y + @velocity, @width, @height)
-      for p in level.platforms do
+      for p in @window.level.platforms do
         @action = :falling if up_rect.intersect?(p)
       end
       @velocity = 0 if @action == :falling
     elsif @action == :pogoing
       up_rect = Rectangle.new(@x, @y + @velocity, @width, @height)
-      for p in level.platforms do
+      for p in @window.level.platforms do
         if up_rect.intersect?(p)
           @action = :pogo_falling 
         end
@@ -193,7 +193,7 @@ class Player < Rectangle
       @velocity = ACCELERATION if @action == :pogo_falling
     elsif @action == :falling && @velocity < 0
       up_rect = Rectangle.new(@x, @y + @velocity, @width, @height)
-      for p in level.platforms do
+      for p in @window.level.platforms do
         if up_rect.intersect?(p)
           @velocity = ACCELERATION
         end
@@ -210,7 +210,7 @@ class Player < Rectangle
       can_right = true
       can_right = false if @action == :pullup
       right_rect = Rectangle.new(@x + SPEED, @y, @width, @height)
-      for p in level.platforms do
+      for p in @window.level.platforms do
         can_right = false if right_rect.intersect?(p)
       end
       @x += SPEED if can_right
@@ -221,7 +221,7 @@ class Player < Rectangle
         # check if you are near the edge of a lefge
         hang = false
         grab_rect = Rectangle.new(@x + @width, @y, 5, 5)
-        for p in level.platforms do
+        for p in @window.level.platforms do
           ledge_rect = Rectangle.new(p.x - 2, p.y - 2, 5, 5)
           if ledge_rect.intersect?(grab_rect) && @velocity >= 0
             hang = true
@@ -256,7 +256,7 @@ class Player < Rectangle
       #   if it overlaps with any of the platforms
       can_left = true
       left_rect = Rectangle.new(@x - SPEED, @y, @width, @height)
-      for p in level.platforms do
+      for p in @window.level.platforms do
         can_left = false if left_rect.intersect?(p)
       end
       @x -= SPEED if can_left
@@ -265,7 +265,7 @@ class Player < Rectangle
       if @action == :falling || @action == :jumping
         hang = false
         grab_rect = Rectangle.new(@x - 5, @y, 5, 5)
-        for p in level.platforms do
+        for p in @window.level.platforms do
           ledge_rect = Rectangle.new(p.x + p.width - 3, p.y - 2, 5, 5)
           if ledge_rect.intersect?(grab_rect) && @velocity >= 0
             hang = true
@@ -295,7 +295,7 @@ class Player < Rectangle
     # if there is a platform and they are falling, stop them
     @action = :falling if @action == :none
     fall_rect = Rectangle.new(@x, @y + @velocity, @width, @height)
-    for p in level.platforms do
+    for p in @window.level.platforms do
       if fall_rect.intersect?(p)
         if @action == :pogo_falling || @action == :pogoing
           if @window.button_down? Gosu::KbLeftControl
@@ -515,7 +515,7 @@ class Player < Rectangle
 
   ##
   # sprinting moves the player through enemies without dying
-  def sprint level
+  def sprint
     return if @action == :hang || @action == :pullup
     return if Gosu.milliseconds - @sprint_time <= SPRINT_COOLDOWN
 
@@ -526,7 +526,7 @@ class Player < Rectangle
       while i < 80
         can_right = true
         right_rect = Rectangle.new(@x + 1, @y, @width, @height)
-        for p in level.platforms do
+        for p in @window.level.platforms do
           can_right = false if right_rect.intersect?(p)
         end
         if can_right
@@ -541,7 +541,7 @@ class Player < Rectangle
       while i < 80
         can_left = true
         left_rect = Rectangle.new(@x - 1, @y, @width, @height)
-        for p in level.platforms do
+        for p in @window.level.platforms do
           can_left = false if left_rect.intersect?(p)
         end
         if can_left
