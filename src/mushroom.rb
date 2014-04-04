@@ -40,14 +40,17 @@ class Mushroom < Enemy
     fall_rect = Rectangle.new(@x, @y + @velocity, @width, @height)
     for p in @window.level.platforms do
       if fall_rect.intersect?(p)
+        if @velocity >= 0
+          @bounce_cycle += 1
+        end
+        @bounce_cycle %= 3
+
         @y = p.y - HEIGHT
-        if @bounce_cycle > 5
+        if @bounce_cycle > 1
           @velocity = BOUNCE_FORCE
         else
           @velocity = SHORT_BOUNCE_FORCE
         end
-        @bounce_cycle += 1
-        @bounce_cycle %= 9
       end
     end
 
