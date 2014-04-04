@@ -30,7 +30,12 @@ class Game < Gosu::Window
     self.caption = "Commander Keen in Revenge of the Shikadi!"
 
     @level = Level.new(self)
-    @player = Player.new(self)
+
+    File.readlines("levels/first.lvl").each do |line|
+      x, y = line.split(/\s/)
+      @player = Player.new(self, x.to_i, y.to_i)
+      break
+    end
 
     @menu_options = [
       :Play,

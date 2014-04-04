@@ -40,13 +40,14 @@ class Level
     @terrain = Gosu::Image::load_tiles(window, "media/Terrain.png", TILE_WIDTH, TILE_HEIGHT * 2, true)
     @enemies = []
     @candies = []
+    @tiles = []
 
     # a grid representing the tiles of the level
     # . = empty background
     # - = platform
     line_no = 0
     File.readlines("levels/first.lvl").each do |line|
-      if line_no == 0
+      if line_no == 1
         # load the tiles (platforms, background, empty space)
         @tiles = line.split(/\s/)
 
@@ -59,7 +60,7 @@ class Level
         # change from small single-character representations of tiles
         # to full name representations
         @tiles.collect! { |t| @tile_types[t] }
-      else
+      elsif line_no > 1
         # load the enemies and candies
         x, y, type = line.split(/\s/)
         class_type = Object.const_get(type)

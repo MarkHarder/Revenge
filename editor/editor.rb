@@ -24,13 +24,16 @@ class Editor < Gosu::Window
     self.caption = "Level Editor"
     @enemies = []
     @candies = []
+    @player = nil
 
     line_no = 0
     if File.exists?("levels/test.lvl")
       File.readlines("levels/test.lvl").each do |line|
         if line_no == 0
+          @player = line.split(/\s/).collect { |x| x.to_i }
+        elsif line_no == 1 
           @tiles = line.split(/\s/)
-        else
+        elsif line_no > 1
           x, y, type = line.split(/\s/)
           class_type = Object.const_get(type)
           class_name_plural = class_type.superclass.to_s.downcase
@@ -54,15 +57,7 @@ class Editor < Gosu::Window
     @tiles.collect! { |t| @swap[t] }
 
     @terrain = Gosu::Image::load_tiles(self, "media/Terrain.png", 32, 50, true)
-
-    @images = {
-      :platform => @terrain[0],
-      :background => @terrain[1],
-      :none => @terrain[2],
-
-      :slug => Slug.new(self, 0, 0).images[0],
-      :spikes => Spikes.new(self, 0, 0).images[0],
-    }
+    @player_image = Gosu::Image::load_tiles(self, "media/PlayerSprites.png", 32, 32, true)
 
     @current_type = :terrain
     @current_selection = :background
@@ -135,6 +130,8 @@ class Editor < Gosu::Window
     end
 
     Gosu::Image.from_text(self, @current_selection.to_s, "Times New Roman", 24).draw(5, 5, 0, 1, 1, 0xffffffff)
+
+    @player_image[0].draw(@player[0] * SCALE - @x_offset * 32 * SCALE, @player[1] * SCALE - @y_offset * 25 * SCALE, 1, SCALE, SCALE) unless @player.nil?
   end
 
   # method called when a button is pressed
@@ -173,7 +170,9 @@ class Editor < Gosu::Window
         @current_selection = :gum
       end
     elsif id == Gosu::Kb3
-      if @current_type == :enemies
+      if @current_type == :terrain
+        @current_selection = :player
+      elsif @current_type == :enemies
         @current_selection = :mushroom
       elsif @current_type == :candies
         @current_selection = :chocolate
@@ -207,6 +206,14 @@ class Editor < Gosu::Window
         x += 32 * @x_offset
         y += 25 * @y_offset
         @enemies.push(Mushroom.new(self, x, y))
+      elsif @current_selection == :player
+        x = (mouse_x / SCALE).to_i
+        x -= x % 32
+        y = (mouse_y / SCALE).to_i
+        y -= y % 25
+        x += 32 * @x_offset
+        y += 25 * @y_offset
+        @player = [x, y]
       elsif @current_type == :candies
         x = (mouse_x / SCALE).to_i
         y = (mouse_y / SCALE).to_i
@@ -221,7 +228,8 @@ class Editor < Gosu::Window
     File.open("levels/test.lvl", "w") do |file|
       x = 0
       y = 0
-      str = ""
+      @player ||= [0, 0]
+      str = "#{@player[0]} #{@player[1]}\n"
       until y == LEVEL_HEIGHT do
         case @tiles[x + LEVEL_WIDTH * y]
         when :none
