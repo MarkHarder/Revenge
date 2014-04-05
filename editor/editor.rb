@@ -59,6 +59,8 @@ class Editor < Gosu::Window
     @terrain = Gosu::Image::load_tiles(self, "media/Terrain.png", 32, 50, true)
     @player_image = Gosu::Image::load_tiles(self, "media/PlayerSprites.png", 32, 32, true)
 
+    @target = Gosu::Image::load_tiles(self, "editor/media/target.png", 32, 32, true)
+
     @current_type = :terrain
     @current_selection = :background
     @x_offset = 0
@@ -132,6 +134,8 @@ class Editor < Gosu::Window
     Gosu::Image.from_text(self, @current_selection.to_s, "Times New Roman", 24).draw(5, 5, 0, 1, 1, 0xffffffff)
 
     @player_image[0].draw(@player[0] * SCALE - @x_offset * 32 * SCALE, @player[1] * SCALE - @y_offset * 25 * SCALE, 1, SCALE, SCALE) unless @player.nil?
+
+    @target[0].draw(mouse_x, mouse_y, 2, SCALE, SCALE) if @current_type == :candies
   end
 
   # method called when a button is pressed
