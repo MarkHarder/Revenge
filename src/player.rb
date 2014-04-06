@@ -92,7 +92,7 @@ class Player < Rectangle
     # collect a candy if you touch it
     # add the candy's score to the player's score
     for candy in @window.level.candies do
-      if intersect?(candy)
+      if intersect?(candy) && @action != :dying
         @score += candy.value
         @window.level.candies.delete(candy)
         if @score >= @next_new_life
