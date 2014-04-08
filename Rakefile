@@ -2,7 +2,7 @@ task :default => :run
 
 desc "run"
 task :run do
-  sh "ruby src/main.rb"
+  sh "ruby lib/revenge.rb"
 end
 
 desc "edit"
@@ -12,7 +12,7 @@ end
 
 desc "documentation"
 task :doc do
-  sh "rdoc src"
+  sh "rdoc lib/revenge"
 end
 
 desc "test"
