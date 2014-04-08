@@ -80,7 +80,7 @@ class Blast < Rectangle
             can_right = false
             #Recognize Enemy Types
             if e.class == Slug
-              @window.level.enemies.delete(e)
+              e.dead = true
               @kill = true
             end
           end
@@ -105,7 +105,7 @@ class Blast < Rectangle
             can_left = false
             #Recognize Enemy Types
             if e.class == Slug
-              @window.level.enemies.delete(e) 
+              e.dead = true
               @kill = true
             end
           end
