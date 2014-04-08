@@ -2,7 +2,7 @@ task :default => :run
 
 desc "run"
 task :run do
-  sh "rm *.gem"
+  sh "rm -f *.gem"
   sh "gem build revenge.gemspec"
   sh "gem install revenge"
   line = "require 'revenge'"
