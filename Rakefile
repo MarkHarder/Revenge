@@ -2,7 +2,8 @@ task :default => :run
 
 desc "run"
 task :run do
-  sh "ruby lib/revenge.rb"
+  line = "require 'revenge'"
+  sh "ruby -e \"#{line}\""
 end
 
 desc "edit"
@@ -17,5 +18,5 @@ end
 
 desc "test"
 task :test do
-  sh "rspec tests/*.rb -f d -c"
+  sh "rspec test/*.rb -f d -c"
 end

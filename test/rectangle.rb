@@ -1,4 +1,4 @@
-require_relative '../src/rectangle.rb'
+require_relative '../lib/revenge/rectangle.rb'
 
 describe Rectangle do
   it "collides with rectangles" do
