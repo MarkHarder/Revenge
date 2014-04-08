@@ -5,12 +5,12 @@
 
 require 'gosu'
 
-require_relative '../src/soda.rb'
-require_relative '../src/gum.rb'
-require_relative '../src/chocolate.rb'
-require_relative '../src/slug.rb'
-require_relative '../src/mushroom.rb'
-require_relative '../src/spikes.rb'
+require_relative '../lib/revenge/soda.rb'
+require_relative '../lib/revenge/gum.rb'
+require_relative '../lib/revenge/chocolate.rb'
+require_relative '../lib/revenge/slug.rb'
+require_relative '../lib/revenge/mushroom.rb'
+require_relative '../lib/revenge/spikes.rb'
 
 class Editor < Gosu::Window
   SCALE = 3
