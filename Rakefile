@@ -14,3 +14,8 @@ desc "documentation"
 task :doc do
   sh "rdoc src"
 end
+
+desc "test"
+task :test do
+  sh "rspec tests/*.rb -f d -c"
+end
