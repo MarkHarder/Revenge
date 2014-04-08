@@ -142,7 +142,7 @@ class Player < Rectangle
     if @isViolent == true
       @blast.each do |b|
         if b.kill
-          @kills += 1
+          @kills += 1 if @kills > 0
           #Change to recognize different values for different enemies
           @score += 25
         end
