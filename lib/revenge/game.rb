@@ -67,11 +67,11 @@ class Game < Gosu::Window
      i = 0
      for option in @menu_options
        color = option == @menu_options[@menu_selection] ? LIGHT_GREEN : DARK_GREEN
-       Gosu::Image.from_text(self, option.to_s, "Times New Roman", 24 * SCALE).draw(100 * SCALE, 50 * i * SCALE + 30 * SCALE, 0, 1, 1, color)
+       Gosu::Image.from_text(self, option.to_s, "Courier New", 24 * SCALE).draw(100 * SCALE, 50 * i * SCALE + 30 * SCALE, 0, 1, 1, color)
        i += 1
      end
    elsif @state == :instructions
-       Gosu::Image.from_text(self, "Use the arrow keys to move the player left and right.\nPress control to jump.\nAlt to toggle the pogo stick.\nSpace to shoot.\n\nCollect candy.\nAvoid enemies.\nGame over if you run out of lives.", "Times New Roman", 12 * SCALE, 10 * SCALE, 250 * SCALE, :left).draw(50 * SCALE, 25 * SCALE, 0, 1, 1, 0xffffffff)
+       Gosu::Image.from_text(self, "Use the arrow keys to move the player left and right.\nPress control to jump.\nAlt to toggle the pogo stick.\nSpace to shoot.\nUp in a doorway for next level.\n\nCollect candy.\nAvoid enemies.\nGame over if you run out of lives.", "Times New Roman", 12 * SCALE, 10 * SCALE, 250 * SCALE, :left).draw(50 * SCALE, 25 * SCALE, 0, 1, 1, 0xffffffff)
    elsif @state == :game
       @level.draw SCALE, @player.x * SCALE, @player.y * SCALE
       @player.draw SCALE
