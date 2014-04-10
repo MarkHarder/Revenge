@@ -11,6 +11,7 @@ class Door < Rectangle
     super(x, y, WIDTH, HEIGHT)
     @window = window
     @images = Gosu::Image::load_tiles(window, "media/Door.png", WIDTH, HEIGHT, true)
+    @leaving = false
   end
 
   ##
@@ -21,6 +22,27 @@ class Door < Rectangle
     px = @x * size
     py = @y * size
 
+    if @leaving
+      if Gosu.milliseconds - @leave_start_milliseconds <= 200
+        image = @images[1]
+      elsif Gosu.milliseconds - @leave_start_milliseconds <= 400
+        image = @images[2]
+      elsif Gosu.milliseconds - @leave_start_milliseconds <= 600
+        image = @images[3]
+      elsif Gosu.milliseconds - @leave_start_milliseconds <= 800
+        image = @images[4]
+      elsif Gosu.milliseconds - @leave_start_milliseconds <= 1000
+        image = @images[5]
+      end
+    end
+
     image.draw(px - x_offset, py - y_offset, 0, size, size)
+  end
+
+  ##
+  # animate the player leaving
+  def leave
+    @leaving = true
+    @leave_start_milliseconds = Gosu.milliseconds
   end
 end

@@ -115,6 +115,8 @@ class Game < Gosu::Window
       if @state == :menu
         @menu_selection += @menu_options.size - 1
         @menu_selection %= @menu_options.size
+      elsif @state == :game
+        @player.leave
       end
     elsif id == Gosu::KbReturn
       if @state == :menu
@@ -129,6 +131,13 @@ class Game < Gosu::Window
         end
       end
     end
+  end
+
+  ##
+  # load the next level
+  def next_level
+    @level.level += 1
+    @level.load_level("levels/level" + @level.level + ".lvl")
   end
 
   ##
