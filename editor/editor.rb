@@ -25,6 +25,7 @@ class Editor < Gosu::Window
     @enemies = []
     @candies = []
     @player = nil
+    @door = nil
 
     line_no = 0
     if File.exists?("levels/test.lvl")
@@ -32,6 +33,8 @@ class Editor < Gosu::Window
         if line_no == 0
           @player = line.split(/\s/).collect { |x| x.to_i }
         elsif line_no == 1 
+          @door = line.split(/\s/).collect { |x| x.to_i }
+        elsif line_no == 2 
           @tiles = line.split(/\s/)
         elsif line_no > 1
           x, y, type = line.split(/\s/)
@@ -58,6 +61,7 @@ class Editor < Gosu::Window
 
     @terrain = Gosu::Image::load_tiles(self, "media/Terrain.png", 32, 50, true)
     @player_image = Gosu::Image::load_tiles(self, "media/PlayerSprites.png", 32, 32, true)
+    @door_image = Gosu::Image::load_tiles(self, "media/Door.png", 32, 64, true)
 
     @target = Gosu::Image::load_tiles(self, "editor/media/target.png", 32, 32, true)
 
@@ -134,6 +138,7 @@ class Editor < Gosu::Window
     Gosu::Image.from_text(self, @current_selection.to_s, "Times New Roman", 24).draw(5, 5, 0, 1, 1, 0xffffffff)
 
     @player_image[0].draw(@player[0] * SCALE - @x_offset * 32 * SCALE, @player[1] * SCALE - @y_offset * 25 * SCALE, 1, SCALE, SCALE) unless @player.nil?
+    @door_image[0].draw(@door[0] * SCALE - @x_offset * 32 * SCALE, @door[1] * SCALE - @y_offset * 25 * SCALE, 1, SCALE, SCALE) unless @door.nil?
 
     @target[0].draw(mouse_x, mouse_y, 2, SCALE, SCALE) if @current_type == :candies
   end
@@ -181,6 +186,10 @@ class Editor < Gosu::Window
       elsif @current_type == :candies
         @current_selection = :chocolate
       end
+    elsif id == Gosu::Kb4
+      if @current_type == :terrain
+        @current_selection = :door
+      end
     elsif id == Gosu::MsLeft
       if @current_selection == :slug
         x = (mouse_x / SCALE).to_i
@@ -217,7 +226,15 @@ class Editor < Gosu::Window
         y -= y % 25
         x += 32 * @x_offset
         y += 25 * @y_offset
+        x += 2
         @player = [x, y]
+      elsif @current_selection == :door
+        x = (mouse_x / SCALE).to_i
+        x -= x % 32
+        y = (mouse_y / SCALE).to_i
+        y -= y % 25
+        y += 2
+        @door = [x, y]
       elsif @current_type == :candies
         x = (mouse_x / SCALE).to_i
         y = (mouse_y / SCALE).to_i
@@ -234,6 +251,7 @@ class Editor < Gosu::Window
       y = 0
       @player ||= [0, 0]
       str = "#{@player[0]} #{@player[1]}\n"
+      str += "#{@door[0]} #{@door[1]}\n"
       until y == LEVEL_HEIGHT do
         case @tiles[x + LEVEL_WIDTH * y]
         when :none

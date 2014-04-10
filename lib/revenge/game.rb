@@ -136,6 +136,7 @@ class Game < Gosu::Window
   ##
   # load the next level
   def next_level
+    @level.level += 1
     load_level("levels/level" + @level.level.to_s + ".lvl")
   end
 
@@ -145,7 +146,6 @@ class Game < Gosu::Window
       @player = Player.new(self, x.to_i, y.to_i)
       break
     end
-    @level.level += 1
     @level.load_level file_name
   end
 

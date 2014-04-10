@@ -54,10 +54,8 @@ class Player < Rectangle
   ##
   # Create a player
   def initialize window, x, y
-    super(@x, @y, WIDTH - 20, HEIGHT - 4)
+    super(x, y, WIDTH - 20, HEIGHT - 4)
 
-    @x = x
-    @y = y
     @start_x = @x
     @start_y = @y
     @direction = :right

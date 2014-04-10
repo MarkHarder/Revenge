@@ -59,8 +59,10 @@ class Level
   # Draw the level on the screen
   # Draw the background and platforms
   def draw size, x_offset=0, y_offset=0
-    x_offset -= 470
-    y_offset -= 330
+    x_offset -= 320 * size / 2
+    y_offset -= 250 * size / 2
+    x_offset += 6 * size
+    y_offset += 15 * size
     # draw background first
     0.upto(WIDTH - 1) do |x|
       (HEIGHT - 1).downto(0) do |y|
