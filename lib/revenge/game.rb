@@ -31,7 +31,7 @@ class Game < Gosu::Window
 
     @level = Level.new(self)
 
-    File.readlines("levels/first.lvl").each do |line|
+    File.readlines("levels/level0.lvl").each do |line|
       x, y = line.split(/\s/)
       @player = Player.new(self, x.to_i, y.to_i)
       break
@@ -136,8 +136,17 @@ class Game < Gosu::Window
   ##
   # load the next level
   def next_level
+    load_level("levels/level" + @level.level.to_s + ".lvl")
+  end
+
+  def load_level file_name
+    File.readlines(file_name).each do |line|
+      x, y = line.split(/\s/)
+      @player = Player.new(self, x.to_i, y.to_i)
+      break
+    end
     @level.level += 1
-    @level.load_level("levels/level" + @level.level + ".lvl")
+    @level.load_level file_name
   end
 
   ##
