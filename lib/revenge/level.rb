@@ -8,6 +8,7 @@ require_relative 'gum.rb'
 require_relative 'chocolate.rb'
 
 require_relative 'rectangle.rb'
+require_relative 'door.rb'
 
 ##
 # A basic level template
@@ -48,6 +49,9 @@ class Level
     line_no = 0
     File.readlines("levels/first.lvl").each do |line|
       if line_no == 1
+        x, y = line.split(/\s/)
+        @door = Door.new(window, x.to_i, y.to_i)
+      elsif line_no == 2
         # load the tiles (platforms, background, empty space)
         @tiles = line.split(/\s/)
 
