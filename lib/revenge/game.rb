@@ -31,7 +31,7 @@ class Game < Gosu::Window
 
     @level = Level.new(self)
 
-    File.readlines("levels/first.lvl").each do |line|
+    File.readlines("levels/level0.lvl").each do |line|
       x, y = line.split(/\s/)
       @player = Player.new(self, x.to_i, y.to_i)
       break
@@ -67,11 +67,11 @@ class Game < Gosu::Window
      i = 0
      for option in @menu_options
        color = option == @menu_options[@menu_selection] ? LIGHT_GREEN : DARK_GREEN
-       Gosu::Image.from_text(self, option.to_s, "Times New Roman", 24 * SCALE).draw(100 * SCALE, 50 * i * SCALE + 30 * SCALE, 0, 1, 1, color)
+       Gosu::Image.from_text(self, option.to_s, "Courier New", 24 * SCALE).draw(100 * SCALE, 50 * i * SCALE + 30 * SCALE, 0, 1, 1, color)
        i += 1
      end
    elsif @state == :instructions
-       Gosu::Image.from_text(self, "Use the arrow keys to move the player left and right.\nPress control to jump.\nAlt to toggle the pogo stick.\nSpace to shoot.\n\nCollect candy.\nAvoid enemies.\nGame over if you run out of lives.", "Times New Roman", 12 * SCALE, 10 * SCALE, 250 * SCALE, :left).draw(50 * SCALE, 25 * SCALE, 0, 1, 1, 0xffffffff)
+       Gosu::Image.from_text(self, "Use the arrow keys to move the player left and right.\nPress control to jump.\nAlt to toggle the pogo stick.\nSpace to shoot.\nUp in a doorway for next level.\n\nCollect candy.\nAvoid enemies.\nGame over if you run out of lives.", "Times New Roman", 12 * SCALE, 10 * SCALE, 250 * SCALE, :left).draw(50 * SCALE, 25 * SCALE, 0, 1, 1, 0xffffffff)
    elsif @state == :game
       @level.draw SCALE, @player.x * SCALE, @player.y * SCALE
       @player.draw SCALE
@@ -115,6 +115,8 @@ class Game < Gosu::Window
       if @state == :menu
         @menu_selection += @menu_options.size - 1
         @menu_selection %= @menu_options.size
+      elsif @state == :game
+        @player.leave
       end
     elsif id == Gosu::KbReturn
       if @state == :menu
@@ -129,6 +131,22 @@ class Game < Gosu::Window
         end
       end
     end
+  end
+
+  ##
+  # load the next level
+  def next_level
+    @level.level += 1
+    load_level("levels/level" + @level.level.to_s + ".lvl")
+  end
+
+  def load_level file_name
+    File.readlines(file_name).each do |line|
+      x, y = line.split(/\s/)
+      @player = Player.new(self, x.to_i, y.to_i)
+      break
+    end
+    @level.load_level file_name
   end
 
   ##

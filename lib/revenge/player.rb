@@ -45,15 +45,17 @@ class Player < Rectangle
   ##
   # cooldown of the sprint feature
   SPRINT_COOLDOWN = 1600
+  ##
+  # time it takes to exit through the door
+  LEAVE_TIME = 1200
+
   SHOOT_TIME = 300
 
   ##
   # Create a player
   def initialize window, x, y
-    super(@x, @y, WIDTH - 20, HEIGHT - 4)
+    super(x, y, WIDTH - 20, HEIGHT - 4)
 
-    @x = x
-    @y = y
     @start_x = @x
     @start_y = @y
     @direction = :right
@@ -84,6 +86,14 @@ class Player < Rectangle
   ##
   # Update the player based on direction and action
   def update
+    # don't update the player if they are leaving
+    if @action == :leave
+      if Gosu.milliseconds - @action_start_milliseconds >= LEAVE_TIME
+        @window.next_level
+      end
+      return
+    end
+
     # die if you touch an enemy
     for enemy in @window.level.enemies do
       die if intersect?(enemy) && !enemy.harmless?
@@ -453,7 +463,7 @@ class Player < Rectangle
     end
 
     # draw the image scaled to size
-    image.draw(px, py, 0, size, size)
+    image.draw(px, py, 0, size, size) unless @action == :leave
   end
 
   def shoot
@@ -512,6 +522,17 @@ class Player < Rectangle
       @lives -= 1
       @action = :dying
       @velocity = DEATH_VELOCITY
+    end
+  end
+
+  ##
+  # check if the player is next to the door
+  # if so leave the level
+  def leave
+    if intersect?(@window.level.door)
+      @action = :leave
+      @action_start_milliseconds = Gosu.milliseconds
+      @window.level.door.leave
     end
   end
 
