@@ -6,6 +6,8 @@ require_relative 'slime.rb'
 
 class Slug < Enemy
   attr_writer :dead
+  attr_reader :invinsible
+  attr_accessor :health 
   ##
   # Slug width
   WIDTH = 16
@@ -39,14 +41,22 @@ class Slug < Enemy
     # :moving if it is moving left or right
     # :sliming if it is dropping slime
     @action = :moving
+    # amount of times needed to be shot in order to be killed
+    @health = 3
     @dead = false
     @action_start_milliseconds = 0
     @death_start_milliseconds = 0
+    
+    @invinsible = false
   end
 
   ##
   # Update the slug. Either move it or start place slime
   def update
+    if @health == 0
+      @dead = true
+      @health = -1
+    end
     if @dead
       @action = :dying
       @death_start_milliseconds = Gosu.milliseconds

@@ -79,8 +79,10 @@ class Blast < Rectangle
           if right_rect.intersect?(e)
             can_right = false
             #Recognize Enemy Types
-            if e.class == Slug
-              e.dead = true
+            if !e.invinsible
+              p "in"
+              #e.dead = true
+              e.health -= 1
               @kill = true
             end
           end
@@ -104,8 +106,10 @@ class Blast < Rectangle
           if left_rect.intersect?(e)
             can_left = false
             #Recognize Enemy Types
-            if e.class == Slug
-              e.dead = true
+            if !e.invinsible
+              p "in"
+              #e.dead = true
+              e.health -= 1
               @kill = true
             end
           end
