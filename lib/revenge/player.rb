@@ -374,11 +374,11 @@ class Player < Rectangle
       elsif @action == :none
         image = @sprites[0]
       elsif @action == :hang
-        px += 25
+        px += 21
         py -= 90
         image = @pullup[5]
       elsif @action == :pullup
-        px += 45
+        px += 42
         py -= 90
         if Gosu.milliseconds - @action_start_milliseconds >= PULLUP_TIME * 3
           image = @pullup[9]
@@ -404,11 +404,11 @@ class Player < Rectangle
       elsif @action == :none
         image = @sprites[8]
       elsif @action == :hang
-        px += 10
+        px += 3
         py -= 90
         image = @pullup[0]
       elsif @action == :pullup
-        px -= 0
+        px -= 6
         py -= 90
         if Gosu.milliseconds - @action_start_milliseconds >= PULLUP_TIME * 3
           image = @pullup[4]
