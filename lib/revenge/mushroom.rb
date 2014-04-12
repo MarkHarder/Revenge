@@ -2,6 +2,9 @@
 # An +enemy+, template for all mushroom enemies
 
 class Mushroom < Enemy
+  attr_writer :dead
+  attr_reader :invinsible
+  attr_accessor :health
   ##
   # Musroom width
   WIDTH = 32
@@ -17,6 +20,9 @@ class Mushroom < Enemy
   ##
   # The force of the short bounce
   SHORT_BOUNCE_FORCE = -4
+  ##
+  # Time it takes to die
+  DEATH_TIME = 400
 
   ##
   # Create a mushroom.
@@ -28,13 +34,35 @@ class Mushroom < Enemy
     # direction the mushroom is facing
     @direction = :left
     @velocity = 0
-
+    @dying = false
+    @dead = false
+    @health = 5
+    
+    @death_start_milliseconds = 0
     @bounce_cycle = 0
+    
+    @invinsible = false
   end
 
   ##
   # Update the mushroom
   def update
+    #when health drops to 0, the mushroom dies
+    if @health == 0
+      @dead = true
+      @health = -1
+    end
+    if @dead
+      @dying = true
+      @death_start_milliseconds = Gosu.milliseconds
+      @dead = false
+    end
+    if @dying
+      if Gosu.milliseconds - @death_start_milliseconds >= DEATH_TIME
+        @window.level.enemies.delete(self)
+      end
+    end
+    
     @direction = @window.player.x < @x ? :left : :right
 
     fall_rect = Rectangle.new(@x, @y + @velocity, @width, @height)

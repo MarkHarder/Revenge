@@ -103,7 +103,7 @@ class Game < Gosu::Window
         @player.sprint
       end
     elsif id == Gosu::KbSpace  
-      if @state == :game
+      if @state == :game and @player.action != :dying
         @player.shoot
       end
     elsif id == Gosu::KbDown || id == Gosu::GpDown
