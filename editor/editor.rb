@@ -233,7 +233,9 @@ class Editor < Gosu::Window
         x -= x % 32
         y = (mouse_y / SCALE).to_i
         y -= y % 25
-        y += 2
+        x += 32 * @x_offset
+        y += 25 * @y_offset
+        y += 2 
         @door = [x, y]
       elsif @current_type == :candies
         x = (mouse_x / SCALE).to_i
