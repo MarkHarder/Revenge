@@ -5,7 +5,7 @@ require_relative 'rectangle.rb'
 # A class to store information about the player
 
 class Player < Rectangle
-  attr_reader :x, :y, :score, :bullets, :kills
+  attr_reader :x, :y, :score, :bullets, :kills, :action
 
   ##
   # The width of the player in pixels
