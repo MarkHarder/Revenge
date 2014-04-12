@@ -14,7 +14,7 @@ require_relative 'door.rb'
 # A basic level template
 
 class Level
-  attr_reader :platforms, :enemies, :candies, :door
+  attr_reader :platforms, :enemies, :candies, :door, :ledges
   attr_accessor :level
 
   ##
@@ -158,10 +158,14 @@ class Level
       line_no += 1
     end
     @platforms = []
+    @ledges = []
 
     # add all the platform rectangles to check for collision
     0.upto(WIDTH - 1) do |x|
       0.upto(HEIGHT - 1) do |y|
+        if @tiles[x + y * WIDTH] == :platform && (y == 0 || @tiles[x + (y - 1) * WIDTH] != :platform)
+          @ledges.push(Rectangle.new(x * TILE_WIDTH, y * TILE_HEIGHT - Y_OFFSET, TILE_WIDTH, TILE_HEIGHT + Y_OFFSET))
+        end
         @platforms.push(Rectangle.new(x * TILE_WIDTH, y * TILE_HEIGHT - Y_OFFSET, TILE_WIDTH, TILE_HEIGHT + Y_OFFSET)) if @tiles[x + y * WIDTH] == :platform
       end
     end

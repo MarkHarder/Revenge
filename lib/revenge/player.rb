@@ -233,7 +233,7 @@ class Player < Rectangle
         # check if you are near the edge of a lefge
         hang = false
         grab_rect = Rectangle.new(@x + @width, @y, 5, 5)
-        for p in @window.level.platforms do
+        for p in @window.level.ledges do
           ledge_rect = Rectangle.new(p.x - 2, p.y - 2, 5, 5)
           if ledge_rect.intersect?(grab_rect) && @velocity >= 0
             hang = true
@@ -277,7 +277,7 @@ class Player < Rectangle
       if @action == :falling || @action == :jumping
         hang = false
         grab_rect = Rectangle.new(@x - 5, @y, 5, 5)
-        for p in @window.level.platforms do
+        for p in @window.level.ledges do
           ledge_rect = Rectangle.new(p.x + p.width - 3, p.y - 2, 5, 5)
           if ledge_rect.intersect?(grab_rect) && @velocity >= 0
             hang = true
