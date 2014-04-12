@@ -74,6 +74,14 @@ class Level
           py = y * TILE_HEIGHT * size - TILE_HEIGHT * size
           # draw to the screen scaled to size
           image.draw(px - x_offset, py - y_offset, 0, size, size)
+        elsif @tiles[x + WIDTH * y] == :background2
+          # choose background terrain
+          image = @terrain[3]
+          # actual top left coordinates
+          px = x * TILE_WIDTH * size
+          py = y * TILE_HEIGHT * size - TILE_HEIGHT * size
+          # draw to the screen scaled to size
+          image.draw(px - x_offset, py - y_offset, 0, size, size)
         end
       end
     end
@@ -137,6 +145,7 @@ class Level
 
         @tile_types = {
           "." => :background,
+          "," => :background2,
           "-" => :platform,
           "x" => :none,
         }
