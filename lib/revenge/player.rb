@@ -465,16 +465,24 @@ class Player < Rectangle
     image.draw(px, py, 0, size, size) unless @action == :leave
   end
 
-  def shoot
-    @shoot_anim = 11 if (@action == :falling or
-                            @action == :jumping or
-                            @action == :pogo_falling or
-                            @action == :pogoing or
-                            @action == :pogo_jumping)
-      @action = :falling
+  ##
+  # Make player shoot a bullet
+  def shoot method
+    #Display animation for 'in the air' shooting
+    if (@action == :falling or
+        @action == :jumping or
+        @action == :pogo_falling or
+        @action == :pogoing or
+        @action == :pogo_jumping)
+      @shoot_anim = 11; @action = :falling if method == :sideways
+      #@action = :falling if method == :sideways
+      #@shoot_anim = ? if method == :down
+    end
     #Replace 3 with SCALE value
     @blast ||= []
-    @blast.push(Blast.new(@window, @direction, @x*3, @y*3, WIDTH))
+    direct = @direction if method == :sideways
+    direct = :down if method == :down
+    @blast.push(Blast.new(@window, direct, @x*3, @y*3, WIDTH))
     @bullets -= 1
     @isViolent = true
     @shoot_start_milliseconds = Gosu.milliseconds

@@ -31,8 +31,10 @@ class Blast < Rectangle
     
     if direction == :left
       @x = x-offset
-    else
+    elsif direction == :right
       @x = x+offset
+    elsif direction == :down
+      @y = y-offset
     end
     @y = y+10
     
@@ -61,23 +63,27 @@ class Blast < Rectangle
     elsif @state == :moving
       if @direction == :left
         @x -= SPEED
-      else
-        #@direction == :right
+      elsif @direction == :right
         @x += SPEED
+      elsif @direction == :down
+        @y += SPEED
       end
       # check if blast has collided with anything
-      # create a rectangle just to the right of blast
+      # create a rectangle next to the blast
       # if it intersects with any of the platforms, collision
       # Collisions with platforms still not working
-      if @direction == :right
-        can_right = true
-        right_rect = Rectangle.new(@x/SCALE, @y/SCALE, @width, @height)
+      if @direction == :right or @direction == :left or @direction == :down
+        can_move = true
+        bx = @x
+        by = @y
+        bx += 10 if @direction == :left        
+        right_rect = Rectangle.new(bx/SCALE, by/SCALE, @width, @height)
         #check platforms for collision
-        @window.level.platforms.each {|p| can_right = false if right_rect.intersect?(p)}
+        @window.level.platforms.each {|p| can_move = false if right_rect.intersect?(p)}
         #check enemies for collision
         @window.level.enemies.each do |e|
           if right_rect.intersect?(e)
-            can_right = false
+            can_move = false
             #Recognize Enemy Types
             if !e.invincible
               e.health -= 1
@@ -85,32 +91,7 @@ class Blast < Rectangle
             end
           end
         end
-        if !can_right
-          @state = :collision
-          @start_milliseconds = Gosu.milliseconds
-        end
-      end
-      
-      # check if blast has collided with anything
-      # create a rectangle just to the left of blast
-      # if it intersects with any of the platforms, collision
-      if @direction == :left
-        can_left = true
-        left_rect = Rectangle.new(@x/SCALE, @y/SCALE, @width, @height)
-        #check platforms for collision
-        @window.level.platforms.each {|p| can_left = false if left_rect.intersect?(p)}
-        #check enemies for collision
-        @window.level.enemies.each do |e|
-          if left_rect.intersect?(e)
-            can_left = false
-            #Recognize Enemy Types
-            if !e.invincible
-              e.health -= 1
-              @kill = true
-            end
-          end
-        end
-        if !can_left
+        if !can_move
           @state = :collision
           @start_milliseconds = Gosu.milliseconds
         end
