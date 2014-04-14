@@ -3,7 +3,7 @@
 
 class Mushroom < Enemy
   attr_writer :dead
-  attr_reader :invinsible
+  attr_reader :invincible
   attr_accessor :health
   ##
   # Musroom width
@@ -41,7 +41,7 @@ class Mushroom < Enemy
     @death_start_milliseconds = 0
     @bounce_cycle = 0
     
-    @invinsible = false
+    @invincible = false
   end
 
   ##
@@ -60,6 +60,9 @@ class Mushroom < Enemy
     if @dying
       if Gosu.milliseconds - @death_start_milliseconds >= DEATH_TIME
         @window.level.enemies.delete(self)
+        @window.player.kills += 1
+        @window.player.score += 25
+        @dying = false
       end
     end
     

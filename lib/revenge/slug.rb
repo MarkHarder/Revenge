@@ -47,7 +47,7 @@ class Slug < Enemy
     @action_start_milliseconds = 0
     @death_start_milliseconds = 0
     
-    @invinsible = false
+    @invincible = false
   end
 
   ##
@@ -65,6 +65,9 @@ class Slug < Enemy
     if @action == :dying
       if Gosu.milliseconds - @death_start_milliseconds >= DEATH_TIME
         @window.level.enemies.delete(self)
+        @window.player.kills += 1
+        @window.player.score += 25
+        @action = :none
       end
     else
       if @action == :moving

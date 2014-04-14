@@ -7,7 +7,7 @@ require_relative 'rectangle.rb'
 # along with base methods for drawing and updating
 
 class Enemy < Rectangle
-  attr_reader :images, :invinsible
+  attr_reader :images, :invincible
 
   ##
   # Creates a new enemy
@@ -19,7 +19,7 @@ class Enemy < Rectangle
     @window = window
 
     @harmless = false
-    @invinsible = true
+    @invincible = true
   end
 
   # basic update loop, override in specific enemy classes
