@@ -24,6 +24,11 @@ class Game < Gosu::Window
   # Dark green color
   DARK_GREEN = 0xff00660E
   ##
+  # The maximum number of the level in the game
+  MAX_LEVEL = 2
+
+
+  ##
   # Create the game, setting up the level and the player
   def initialize
     super WIDTH * SCALE, HEIGHT * SCALE, false
@@ -136,8 +141,37 @@ class Game < Gosu::Window
   ##
   # load the next level
   def next_level
-    @level.level += 1
-    load_level("levels/level" + @level.level.to_s + ".lvl")
+    if @level.level == MAX_LEVEL
+      restart_game
+    else
+      @level.level += 1
+      load_level("levels/level" + @level.level.to_s + ".lvl")
+    end
+  end
+
+  ##
+  # Restart the game from the beginning
+  def restart_game
+    @level = 0
+    @level = Level.new(self)
+
+    File.readlines("levels/level0.lvl").each do |line|
+      x, y = line.split(/\s/)
+      @player = Player.new(self, x.to_i, y.to_i)
+      break
+    end
+
+    @menu_options = [
+      :Play,
+      :Instructions,
+      :"Save/Load",
+      :Quit
+    ]
+
+    @menu_selection = 0
+
+    @state = :menu
+    @paused = false
   end
 
   def load_level file_name
