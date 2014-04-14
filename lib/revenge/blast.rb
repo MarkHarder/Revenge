@@ -76,12 +76,12 @@ class Blast < Rectangle
       bx = @x
       by = @y
       bx += 10 if @direction == :left        
-      right_rect = Rectangle.new(bx/SCALE, by/SCALE, @width, @height)
+      offset_rect = Rectangle.new(bx/SCALE, by/SCALE, @width, @height)
       #check platforms for collision
-      @window.level.platforms.each {|p| can_move = false if right_rect.intersect?(p)}
+      @window.level.platforms.each {|p| can_move = false if offset_rect.intersect?(p)}
       #check enemies for collision
       @window.level.enemies.each do |e|
-        if right_rect.intersect?(e)
+        if offset_rect.intersect?(e)
           can_move = false
           #Recognize Enemy Types
           if !e.invincible
@@ -98,7 +98,6 @@ class Blast < Rectangle
       if Gosu.milliseconds - @start_milliseconds > EXPLOSION_TIME
         @state = :finished
       end
-    else
     end
   end
 
@@ -112,9 +111,11 @@ class Blast < Rectangle
     elsif @state == :moving
         @image = @sprites[(Gosu::milliseconds / 60 % 4) + 1] if @direction == :right
         @image = @sprites[(Gosu::milliseconds / 60 % 4) + 9] if @direction == :left
+        @image = @sprites[(Gosu::milliseconds / 60 % 4) + 17] if @direction == :down
     elsif @state == :collision
       @image = @sprites[(Gosu::milliseconds / 120 % 3 + 5)] if @direction == :right
       @image = @sprites[(Gosu::milliseconds / 120 % 3 + 13)] if @direction == :left
+      @image = @sprites[(Gosu::milliseconds / 120 % 3) + 21] if @direction == :down
     else
       #state == :finished
       @image = @sprites[0] if @direction == :right
