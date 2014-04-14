@@ -54,6 +54,7 @@ class Editor < Gosu::Window
     @swap = {
       "x" => :none,
       "." => :background,
+      "," => :background2,
       "-" => :platform,
     }
 
@@ -78,7 +79,7 @@ class Editor < Gosu::Window
   # update the logic of the game
   def update
     if button_down? Gosu::MsLeft
-      if @current_selection == :platform || @current_selection == :background
+      if @current_selection == :platform || @current_selection == :background || @current_selection == :background2
         x = mouse_x / (32 * SCALE)
         x += @x_offset
         y = mouse_y / (25 * SCALE)
@@ -96,6 +97,14 @@ class Editor < Gosu::Window
         if @tiles[x + @x_offset + LEVEL_WIDTH * (y + @y_offset)] == :background
           # choose background terrain
           image = @terrain[1]
+          # actual top left coordinates
+          px = x * 32 * SCALE
+          py = y * 25 * SCALE - 25 * SCALE
+          # draw to the screen scaled to size
+          image.draw(px, py, 0, SCALE, SCALE)
+        elsif @tiles[x + @x_offset + LEVEL_WIDTH * (y + @y_offset)] == :background2
+          # choose background terrain
+          image = @terrain[3]
           # actual top left coordinates
           px = x * 32 * SCALE
           py = y * 25 * SCALE - 25 * SCALE
@@ -190,6 +199,10 @@ class Editor < Gosu::Window
       if @current_type == :terrain
         @current_selection = :door
       end
+    elsif id == Gosu::Kb5
+      if @current_type == :terrain
+        @current_selection = :background2
+      end
     elsif id == Gosu::MsLeft
       if @current_selection == :slug
         x = (mouse_x / SCALE).to_i
@@ -233,7 +246,9 @@ class Editor < Gosu::Window
         x -= x % 32
         y = (mouse_y / SCALE).to_i
         y -= y % 25
-        y += 2
+        x += 32 * @x_offset
+        y += 25 * @y_offset
+        y += 2 
         @door = [x, y]
       elsif @current_type == :candies
         x = (mouse_x / SCALE).to_i
@@ -258,6 +273,8 @@ class Editor < Gosu::Window
           str += "x "
         when :background
           str += ". "
+        when :background2
+          str += ", "
         when :platform
           str += "- "
         end

@@ -232,7 +232,7 @@ class Player < Rectangle
         # check if you are near the edge of a lefge
         hang = false
         grab_rect = Rectangle.new(@x + @width, @y, 5, 5)
-        for p in @window.level.platforms do
+        for p in @window.level.ledges do
           ledge_rect = Rectangle.new(p.x - 2, p.y - 2, 5, 5)
           if ledge_rect.intersect?(grab_rect) && @velocity >= 0
             hang = true
@@ -276,7 +276,7 @@ class Player < Rectangle
       if @action == :falling || @action == :jumping
         hang = false
         grab_rect = Rectangle.new(@x - 5, @y, 5, 5)
-        for p in @window.level.platforms do
+        for p in @window.level.ledges do
           ledge_rect = Rectangle.new(p.x + p.width - 3, p.y - 2, 5, 5)
           if ledge_rect.intersect?(grab_rect) && @velocity >= 0
             hang = true
@@ -373,11 +373,11 @@ class Player < Rectangle
       elsif @action == :none
         image = @sprites[0]
       elsif @action == :hang
-        px += 25
+        px += 21
         py -= 90
         image = @pullup[5]
       elsif @action == :pullup
-        px += 45
+        px += 42
         py -= 90
         if Gosu.milliseconds - @action_start_milliseconds >= PULLUP_TIME * 3
           image = @pullup[9]
@@ -403,11 +403,11 @@ class Player < Rectangle
       elsif @action == :none
         image = @sprites[8]
       elsif @action == :hang
-        px += 10
+        px += 3
         py -= 90
         image = @pullup[0]
       elsif @action == :pullup
-        px -= 0
+        px -= 6
         py -= 90
         if Gosu.milliseconds - @action_start_milliseconds >= PULLUP_TIME * 3
           image = @pullup[4]
