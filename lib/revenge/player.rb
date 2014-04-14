@@ -475,7 +475,7 @@ class Player < Rectangle
         @action == :pogoing or
         @action == :pogo_jumping)
       @shoot_anim = 11; @action = :falling if method == :sideways
-      #@action = :falling if method == :sideways
+      @action = :falling
       #@shoot_anim = ? if method == :down
     end
     #Replace 3 with SCALE value

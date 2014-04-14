@@ -113,8 +113,8 @@ class Blast < Rectangle
         @image = @sprites[(Gosu::milliseconds / 60 % 4) + 9] if @direction == :left
         @image = @sprites[(Gosu::milliseconds / 60 % 4) + 17] if @direction == :down
     elsif @state == :collision
-      @image = @sprites[(Gosu::milliseconds / 120 % 3 + 5)] if @direction == :right
-      @image = @sprites[(Gosu::milliseconds / 120 % 3 + 13)] if @direction == :left
+      @image = @sprites[(Gosu::milliseconds / 120 % 3) + 5] if @direction == :right
+      @image = @sprites[(Gosu::milliseconds / 120 % 3) + 13] if @direction == :left
       @image = @sprites[(Gosu::milliseconds / 120 % 3) + 21] if @direction == :down
     else
       #state == :finished
