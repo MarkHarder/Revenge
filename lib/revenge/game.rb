@@ -104,7 +104,7 @@ class Game < Gosu::Window
       end
     elsif id == Gosu::KbSpace  
       if @state == :game and @player.action != :dying
-        @player.shoot
+        @player.shoot unless @player.bullets <= 0
       end
     elsif id == Gosu::KbDown || id == Gosu::GpDown
       if @state == :menu

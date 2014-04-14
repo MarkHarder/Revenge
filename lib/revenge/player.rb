@@ -5,8 +5,8 @@ require_relative 'rectangle.rb'
 # A class to store information about the player
 
 class Player < Rectangle
-  attr_reader :x, :y, :score, :bullets, :action
-  attr_accessor :kills
+  attr_reader :x, :y, :bullets, :action
+  attr_accessor :kills, :score
 
   ##
   # The width of the player in pixels
@@ -152,7 +152,7 @@ class Player < Rectangle
     #if a blast kills an enemy, increase kill count
     if @isViolent == true
       @blast.each do |b|
-        if b.kill          
+        if b.kill
           #Change to recognize different values for different enemies
         end
       end
