@@ -102,8 +102,11 @@ class Game < Gosu::Window
       if @state == :game
         @player.sprint
       end
-    elsif id == Gosu::KbSpace  
-      if @state == :game and @player.action != :dying
+    elsif id == Gosu::KbSpace
+      if @state == :game and
+        @player.action != :dying and
+        @player.action != :pullup and
+        @player.action != :hang
         @player.shoot :sideways unless @player.bullets <= 0
       end
     elsif id == Gosu::KbDown || id == Gosu::GpDown
