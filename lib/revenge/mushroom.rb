@@ -48,22 +48,15 @@ class Mushroom < Enemy
   # Update the mushroom
   def update
     #when health drops to 0, the mushroom dies
-    if @health == 0
+    if @health <= 0
       @dead = true
-      @health = -1
+      @health = 0
     end
     if @dead
-      @dying = true
-      @death_start_milliseconds = Gosu.milliseconds
-      @dead = false
-    end
-    if @dying
-      if Gosu.milliseconds - @death_start_milliseconds >= DEATH_TIME
-        @window.level.enemies.delete(self)
-        @window.player.kills += 1
-        @window.player.score += 25
-        @dying = false
-      end
+      @window.player.kills += 1
+      @window.player.score += 25
+      @window.level.enemies.delete(self)
+      @dying = false
     end
     
     @direction = @window.player.x < @x ? :left : :right
@@ -104,5 +97,7 @@ class Mushroom < Enemy
     end
 
     image.draw(px - x_offset, py - y_offset, 0, size, size)
+    drawHealth @health, size, px - x_offset, py - y_offset
+
   end
 end

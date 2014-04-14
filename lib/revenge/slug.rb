@@ -158,5 +158,6 @@ class Slug < Enemy
       image = @deathSprites[(Gosu::milliseconds/140 % 4)]
     end
     image.draw(px - x_offset, py - y_offset, 0, size, size)
+    drawHealth @health, size, px - x_offset, py - y_offset
   end
 end

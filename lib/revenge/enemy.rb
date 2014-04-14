@@ -12,14 +12,17 @@ class Enemy < Rectangle
   ##
   # Creates a new enemy
   #
-  # Positioned at (x, y) and with the given width and height
-  def initialize window, x, y, width, height, images
+  # Positioned at (x, y) and with the given width and height 
+  def initialize(window, x, y, width, height, images)
     super x, y, width, height
     @images = images
     @window = window
 
     @harmless = false
     @invincible = true
+    
+    #@healthbar = Gosu::Image.new(window, "media/healthbar.png", 20px, 5px, true)
+    @healthbar = Gosu::Image.new(window, 'media/healthbar.png', false)
   end
 
   # basic update loop, override in specific enemy classes
@@ -34,6 +37,8 @@ class Enemy < Rectangle
 
     image = @images.is_a?(Array) ? @images[0] : @images
     image.draw(px - x_offset, py - y_offset, 0, size, size)
+
+
   end
 
   ##
@@ -41,5 +46,12 @@ class Enemy < Rectangle
   # default is not harmless - if the player intersects the enemy they will die
   def harmless?
     @harmless
+  end
+  def drawHealth health, size, px, py
+    unless health <= 0
+      px = px + 15
+      py = py - 20
+      @healthbar.draw_as_quad(px, py, 0xffffffff, px+health*10, py, 0xffffffff, px+health*10, py+10, 0xffffffff, px, py+10, 0xffffffff, 10)
+    end
   end
 end
