@@ -21,7 +21,6 @@ class Enemy < Rectangle
     @harmless = false
     @invincible = true
     
-    #@healthbar = Gosu::Image.new(window, "media/healthbar.png", 20px, 5px, true)
     @healthbar = Gosu::Image.new(window, 'media/healthbar.png', false)
   end
 
@@ -47,8 +46,12 @@ class Enemy < Rectangle
   def harmless?
     @harmless
   end
+  
+  ##
+  # Draw a healthbar on top of enemy if they are currently alive
   def drawHealth health, size, px, py
     unless health <= 0
+      #healthbar offsets
       px = px + 15
       py = py - 20
       @healthbar.draw_as_quad(px, py, 0xffffffff, px+health*10, py, 0xffffffff, px+health*10, py+10, 0xffffffff, px, py+10, 0xffffffff, 10)
