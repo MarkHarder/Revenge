@@ -185,7 +185,7 @@ class Game < Gosu::Window
   def load_level file_name
     File.readlines(file_name).each do |line|
       x, y = line.split(/\s/)
-      @player = Player.new(self, x.to_i, y.to_i)
+      @player.start_level x.to_i, y.to_i
       break
     end
     @level.load_level file_name

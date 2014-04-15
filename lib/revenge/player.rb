@@ -84,6 +84,25 @@ class Player < Rectangle
     @isViolent = false
   end
 
+  def start_level x, y
+    @x = x
+    @y = y
+    @start_x = @x
+    @start_y = @y
+    @direction = :right
+    @hang_direction = :none
+    @velocity = 1
+
+    @action = :falling
+    @action_start_milliseconds = 0
+    @bounce_start_milliseconds = 0
+    @shoot_start_milliseconds = 0
+    @sprint_time = 0
+
+    @shoot_anim = 0
+    @isViolent = false
+  end
+
   ##
   # Update the player based on direction and action
   def update
