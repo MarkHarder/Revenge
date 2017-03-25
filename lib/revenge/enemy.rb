@@ -14,7 +14,7 @@ class Enemy < Rectangle
   #
   # Positioned at (x, y) and with the given width and height 
   def initialize(window, x, y, width, height, images)
-    super x, y, width, height
+    super(x, y, width, height)
     @images = images
     @window = window
 
@@ -26,6 +26,20 @@ class Enemy < Rectangle
 
   # basic update loop, override in specific enemy classes
   def update
+    if !@invincible && @health <= 0 && !@dead
+      @dead = true
+      @action = :dying
+      @death_start_milliseconds = Gosu.milliseconds
+      @harmless = true
+    end
+    if @action == :dying
+      if Gosu.milliseconds - @death_start_milliseconds >= @death_time
+        @window.level.enemies.delete(self)
+        @window.player.kills += 1
+        @window.player.score += @score
+        @action = :none
+      end
+    end
   end
 
   ##

@@ -6,7 +6,6 @@ require_relative 'slime.rb'
 
 class Slug < Enemy
   attr_writer :dead
-  attr_reader :invinsible
   attr_accessor :health 
   ##
   # Slug width
@@ -46,6 +45,8 @@ class Slug < Enemy
     @dead = false
     @action_start_milliseconds = 0
     @death_start_milliseconds = 0
+    @death_time = DEATH_TIME
+    @score = 25
     
     @invincible = false
   end
@@ -53,41 +54,16 @@ class Slug < Enemy
   ##
   # Update the slug. Either move it or start place slime
   def update
-    if @health == 0
-      @dead = true
-      @health = -1
-    end
-    if @dead
-      @action = :dying
-      @death_start_milliseconds = Gosu.milliseconds
-      @dead = false
-    end
-    if @action == :dying
-      if Gosu.milliseconds - @death_start_milliseconds >= DEATH_TIME
-        @window.level.enemies.delete(self)
-        @window.player.kills += 1
-        @window.player.score += 25
-        @action = :none
+    super()
+    if @action == :moving
+      # random chance it will start droping slime
+      if rand(20 * 60) == 0
+        @action = :sliming
+        @action_start_milliseconds = Gosu.milliseconds
+        # add the slime
+        @window.level.enemies.push(Slime.new(@window, @x, @y + @height))
       end
-    else
-      if @action == :moving
-        # random chance it will start droping slime
-        if rand(20 * 60) == 0
-          @action = :sliming
-          @action_start_milliseconds = Gosu.milliseconds
-          # add the slime
-          @window.level.enemies.push(Slime.new(@window, @x, @y + @height))
-        end
-      end
-  
-      if @action == :sliming
-        # wait before resuming moving
-        if Gosu.milliseconds - @action_start_milliseconds >= SLIME_TIME
-          @action = :moving
-          @direction = rand(2) == 0 ? :left : :right
-        end
-      end
-  
+
       # turn if a rectangle slightly lower and to the left of the slug
       # doesn't intersect any platforms
       # also check if there is a platform right in front of it
@@ -128,6 +104,12 @@ class Slug < Enemy
         else
           @x += SPEED
         end
+      end
+    elsif @action == :sliming
+      # wait before resuming moving
+      if Gosu.milliseconds - @action_start_milliseconds >= SLIME_TIME
+        @action = :moving
+        @direction = rand(2) == 0 ? :left : :right
       end
     end
   end

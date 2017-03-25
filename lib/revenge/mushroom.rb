@@ -42,23 +42,14 @@ class Mushroom < Enemy
     @bounce_cycle = 0
     
     @invincible = false
+    @death_time = 0
+    @score = 25
   end
 
   ##
   # Update the mushroom
   def update
-    #when health drops to 0, the mushroom dies
-    if @health <= 0
-      @dead = true
-      @health = 0
-    end
-    if @dead
-      @window.player.kills += 1
-      @window.player.score += 25
-      @window.level.enemies.delete(self)
-      @dying = false
-    end
-    
+    super()
     @direction = @window.player.x < @x ? :left : :right
 
     fall_rect = Rectangle.new(@x, @y + @velocity, @width, @height)
