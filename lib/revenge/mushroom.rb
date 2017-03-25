@@ -2,8 +2,6 @@
 # An +enemy+, template for all mushroom enemies
 
 class Mushroom < Enemy
-  attr_writer :dead
-  attr_reader :invincible
   attr_accessor :health
   ##
   # Musroom width
@@ -35,15 +33,17 @@ class Mushroom < Enemy
     @direction = :left
     @velocity = 0
     @dying = false
-    @dead = false
     @health = 5
     
     @death_start_milliseconds = 0
     @bounce_cycle = 0
     
-    @invincible = false
     @death_time = 0
     @score = 25
+  end
+
+  def invincible?
+    false
   end
 
   ##

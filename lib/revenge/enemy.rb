@@ -7,7 +7,7 @@ require_relative 'rectangle.rb'
 # along with base methods for drawing and updating
 
 class Enemy < Rectangle
-  attr_reader :images, :invincible
+  attr_reader :images
 
   ##
   # Creates a new enemy
@@ -17,20 +17,31 @@ class Enemy < Rectangle
     super(x, y, width, height)
     @images = images
     @window = window
-
-    @harmless = false
-    @invincible = true
     
     @healthbar = Gosu::Image.new(window, 'media/healthbar.png', false)
+    @score = 25
+  end
+
+  def invincible?
+    true
+  end
+
+  ##
+  # check if the enemy will kill the player
+  # default is not harmless - if the player intersects the enemy they will die
+  def harmless?
+    dead?
+  end
+
+  def dead?
+    !invincible? && @health <= 0
   end
 
   # basic update loop, override in specific enemy classes
   def update
-    if !@invincible && @health <= 0 && !@dead
-      @dead = true
+    if dead? && @action != :dying
       @action = :dying
       @death_start_milliseconds = Gosu.milliseconds
-      @harmless = true
     end
     if @action == :dying
       if Gosu.milliseconds - @death_start_milliseconds >= @death_time
@@ -52,13 +63,6 @@ class Enemy < Rectangle
     image.draw(px - x_offset, py - y_offset, 0, size, size)
 
 
-  end
-
-  ##
-  # check if the enemy will kill the player
-  # default is not harmless - if the player intersects the enemy they will die
-  def harmless?
-    @harmless
   end
   
   ##

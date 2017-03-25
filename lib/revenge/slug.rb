@@ -5,7 +5,6 @@ require_relative 'slime.rb'
 # An +enemy+, template for all slug enemies
 
 class Slug < Enemy
-  attr_writer :dead
   attr_accessor :health 
   ##
   # Slug width
@@ -42,13 +41,13 @@ class Slug < Enemy
     @action = :moving
     # amount of times needed to be shot in order to be killed
     @health = 3
-    @dead = false
     @action_start_milliseconds = 0
     @death_start_milliseconds = 0
     @death_time = DEATH_TIME
-    @score = 25
-    
-    @invincible = false
+  end
+
+  def invincible?
+    false
   end
 
   ##

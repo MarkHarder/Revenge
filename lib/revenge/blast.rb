@@ -1,7 +1,7 @@
 require_relative 'rectangle.rb'
 
 class Blast < Rectangle
-  attr_reader :kill, :state, :collisionWith
+  attr_reader :kill, :state
   ##
   # The width of the blast in pixels
   WIDTH = 14
@@ -46,7 +46,6 @@ class Blast < Rectangle
     @state = :initial
     
     # Holds the class name of the element that was collided against
-    @collisionWith = :none
     @kill = false
     @start_milliseconds = 0
   end
@@ -84,7 +83,7 @@ class Blast < Rectangle
         if offset_rect.intersect?(e)
           can_move = false
           #Recognize Enemy Types
-          if !e.invincible
+          if !e.invincible?
             e.health -= 1
             @kill = true
           end

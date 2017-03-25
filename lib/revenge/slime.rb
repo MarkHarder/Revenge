@@ -26,13 +26,19 @@ class Slime < Enemy
     @creation_milliseconds = Gosu.milliseconds
   end
 
+  def harmless?
+    if Gosu.milliseconds - @creation_milliseconds >= SLIME_TIME
+      return true
+    else
+      return false
+    end
+  end
+
   ##
   # Check if the slime is harmless or if it disappears
   def update
     if Gosu.milliseconds - @creation_milliseconds >= SLIME_TIME * 2
       @window.level.enemies.delete(self)
-    elsif Gosu.milliseconds - @creation_milliseconds >= SLIME_TIME
-      @harmless = true
     end
   end
 
@@ -40,7 +46,7 @@ class Slime < Enemy
   # Draw the slime or the harmless slime
   def draw size, x_offset, y_offset
     image = @images[0]
-    image = @images[1] if @harmless
+    image = @images[1] if harmless?
 
     px = @x * size
     py = @y * size
