@@ -4,7 +4,6 @@ require_relative 'player.rb'
 
 ##
 # The main game engine
-
 class Game < Gosu::Window
   attr_reader :player, :level
 
@@ -15,7 +14,7 @@ class Game < Gosu::Window
   # Width of the window in pixels before scaling
   WIDTH = 32 * 10
   ##
-  # Width of the window in pixels before scaling
+  # Height of the window in pixels before scaling
   HEIGHT = 25 * 10
   ##
   # Light green color
@@ -24,14 +23,14 @@ class Game < Gosu::Window
   # Dark green color
   DARK_GREEN = 0xff00660E
   ##
-  # The maximum number of the level in the game
+  # The number of the level in the game
   MAX_LEVEL = 2
 
 
   ##
   # Create the game, setting up the level and the player
   def initialize
-    super WIDTH * SCALE, HEIGHT * SCALE, false
+    super(WIDTH * SCALE, HEIGHT * SCALE, false)
     self.caption = "Commander Keen in Revenge of the Shikadi!"
 
     @level = Level.new(self)
@@ -194,7 +193,6 @@ class Game < Gosu::Window
   ##
   # Run the game
   def run
-    # show the window
-    show
+    show()
   end
 end
