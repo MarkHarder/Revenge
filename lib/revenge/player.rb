@@ -461,24 +461,25 @@ class Player < Rectangle
   ##
   # Make player shoot a bullet
   def shoot(method)
-    return if @bullets <= 0
-
     if method == :sideways
       return if @action == :dying || @action == :pullup || @action == :hang
       #Display animation for 'in the air' shooting
-      @shoot_anim = 11
+      @shoot_anim = 11 if @action == :jumping || @action == :falling || @action == :pogoing || @action == :pogo_falling
       direct = @direction
     else
-      return if @action != :jumping && @action != :pogoing && @action != :falling
+      return if @action != :jumping && @action != :pogoing && @action != :falling && @action != :pogo_falling
       # TODO @shoot_anim = ? if method == :down
       direct = :down
     end
     @action = :falling
-    #Replace 3 with SCALE value
-    @blast.push(Blast.new(@window, direct, @x*3, @y*3, WIDTH))
-    @bullets -= 1
     @isViolent = true
-    @shoot_start_milliseconds = Gosu.milliseconds
+
+    if @bullets > 0
+      #Replace 3 with SCALE value
+      @blast.push(Blast.new(@window, direct, @x*3, @y*3, WIDTH))
+      @bullets -= 1
+      @shoot_start_milliseconds = Gosu.milliseconds
+    end
   end
 
   ##
