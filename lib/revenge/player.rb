@@ -321,7 +321,7 @@ class Player < Rectangle
     # if there is a platform and the player is pogoing, they bounce back up
     # if there is a platform and they are falling, stop them
     @action = :falling if @action == :none
-    fall_rect = Rectangle.new(@x, @y + @velocity, @width, @height)
+    fall_rect = Rectangle.new(@x, @y + @velocity + 4, @width, @height)
     for p in @window.level.platforms do
       if fall_rect.intersect?(p)
         if @action == :pogo_falling || @action == :pogoing
