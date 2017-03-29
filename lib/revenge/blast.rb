@@ -50,10 +50,10 @@ class Blast < Rectangle
     @start_milliseconds = 0
   end
   
-    ##
-    # Update the blast animation based on direction
-    # whether it has collided with anything
-    def update
+  ##
+  # Update the blast animation based on direction
+  # whether it has collided with anything
+  def update
     # Kill can only be true for one frame
     @kill = false if @kill
 
@@ -77,7 +77,12 @@ class Blast < Rectangle
       bx += 10 if @direction == :left        
       offset_rect = Rectangle.new(bx/SCALE, by/SCALE, @width, @height)
       #check platforms for collision
-      @window.level.platforms.each {|p| can_move = false if offset_rect.intersect?(p)}
+      @window.level.platforms.each do |p|
+        if offset_rect.intersect?(p)
+          can_move = false 
+          break
+        end
+      end
       #check enemies for collision
       @window.level.enemies.each do |e|
         if offset_rect.intersect?(e) && !e.dead?
@@ -87,6 +92,7 @@ class Blast < Rectangle
             e.health -= 1
             @kill = true
           end
+          break
         end
       end
       if !can_move

@@ -102,16 +102,10 @@ class Game < Gosu::Window
         @player.sprint
       end
     elsif id == Gosu::KbSpace
-      if @state == :game and
-        !button_down? Gosu::KbDown
-        @player.action != :dying and
-        @player.action != :pullup and
-        @player.action != :hang
-        @player.shoot :sideways unless @player.bullets <= 0
-      elsif @state == :game and
-            button_down? Gosu::KbDown and
-            (@player.action == :jumping or @player.action == :pogoing or @player.action == :falling)
-        @player.shoot :down unless @player.bullets <= 0
+      if @state == :game && !button_down?(Gosu::KbDown)
+        @player.shoot(:sideways)
+      elsif @state == :game && button_down?(Gosu::KbDown)
+        @player.shoot(:down)
       end
     elsif id == Gosu::KbDown || id == Gosu::GpDown
       if @state == :menu

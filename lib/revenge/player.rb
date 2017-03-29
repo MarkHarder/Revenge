@@ -5,7 +5,7 @@ require_relative 'rectangle.rb'
 # A class to store information about the player
 
 class Player < Rectangle
-  attr_reader :x, :y, :bullets, :action
+  attr_reader :x, :y, :action
   attr_accessor :kills, :score
 
   ##
@@ -80,6 +80,7 @@ class Player < Rectangle
     #@shoot_anim only takes effect when in true mode
     @shoot_anim = 0
     @isViolent = false
+    @blast = []
   end
 
   def start_level(x, y)
@@ -163,32 +164,18 @@ class Player < Rectangle
         end
       end
     end
-
-    # ~shooting
-    #if a blast kills an enemy, increase kill count
-    if @isViolent == true
-      @blast.each do |b|
-        if b.kill
-          #Change to recognize different values for different enemies
-        end
-      end
-    end
     
-    if defined? @blast
-      @blast.each do |b|
-        b.update
-        #Check if all blasts have finished
-        if b.finished?
-          @blast.delete(b)
-        end
-      end
-      @blast.each do |b|
-        @isViolent = false if b.state == :finished
-      end
-        
-      if @blast.empty?
+    @blast.each do |b|
+      b.update
+      #Check if all blasts have finished
+      if b.finished?
+        @blast.delete(b)
         @isViolent = false
       end
+    end
+      
+    if @blast.empty?
+      @isViolent = false
     end
 
     # jump when control is pressed
@@ -376,7 +363,7 @@ class Player < Rectangle
     # split based on the direction the player is facing
     # from there choose the image based on the current action
     if @direction == :right
-      if @action == :jumping || @action == :falling || @action == :pogo_jumping
+      if @action == :jumping || @action == :falling
         image = @sprites[(Gosu::milliseconds / 520 % 2) + 5]
       elsif @action == :pogoing || @action == :pogo_falling
         if Gosu::milliseconds - @bounce_start_milliseconds >= BOUNCE_TIME
@@ -406,7 +393,7 @@ class Player < Rectangle
         end
       end
     else
-      if @action == :jumping || @action == :falling || @action == :pogo_jumping
+      if @action == :jumping || @action == :falling
         image = @sprites[(Gosu::milliseconds / 520 % 2) + 14]
       elsif @action == :pogoing || @action == :pogo_falling
         if Gosu::milliseconds - @bounce_start_milliseconds >= BOUNCE_TIME
@@ -439,42 +426,32 @@ class Player < Rectangle
 
     # ~shooting
     # if player is shooting
-    if (@isViolent == true and @direction == :right)
+    if @isViolent 
       case @shoot_anim
       when 0..9
         #On the ground
-        image = @sprites[16]
-        @shoot_anim += 1
+        if @direction == :right
+          image = @sprites[16]
+        else
+          image = @sprites[24]
+        end
       when 11..20
         #In the air
-        image = @sprites[17]
-        @shoot_anim += 1
-      else
-        @isViolent = false
+        if @direction == :right
+          image = @sprites[17]
+        else
+          image = @sprites[25]
+        end
       end
-    elsif @isViolent == false
-      @shoot_anim = 0
-    end
-    if (@isViolent == true and @direction == :left)
-      case @shoot_anim
-      when 0..9
-        #On the ground
-        image = @sprites[24]
-        @shoot_anim += 1
-      when 11..20
-        #In the air
-        image = @sprites[25]
-        @shoot_anim += 1
-      else
-        @isViolent = false
-      end
-    elsif @isViolent == false
+      @shoot_anim += 1
+      @isViolent = false if @shoot_anim % 10 == 0
+    else
       @shoot_anim = 0
     end
     
     #if any bullets exist, draw them
-    if defined?(@blast)
-      @blast.each {|b| b.draw(size, @x*size, @y*size)}
+    @blast.each do |b|
+      b.draw(size, @x*size, @y*size)
     end
 
     # draw the image scaled to size
@@ -483,21 +460,21 @@ class Player < Rectangle
 
   ##
   # Make player shoot a bullet
-  def shoot method
-    #Display animation for 'in the air' shooting
-    if (@action == :falling or
-        @action == :jumping or
-        @action == :pogo_falling or
-        @action == :pogoing or
-        @action == :pogo_jumping)
-      @shoot_anim = 11; @action = :falling if method == :sideways
-      @action = :falling
-      #@shoot_anim = ? if method == :down
+  def shoot(method)
+    return if @bullets <= 0
+
+    if method == :sideways
+      return if @action == :dying || @action == :pullup || @action == :hang
+      #Display animation for 'in the air' shooting
+      @shoot_anim = 11
+      direct = @direction
+    else
+      return if @action != :jumping && @action != :pogoing && @action != :falling
+      # TODO @shoot_anim = ? if method == :down
+      direct = :down
     end
+    @action = :falling
     #Replace 3 with SCALE value
-    @blast ||= []
-    direct = @direction if method == :sideways
-    direct = :down if method == :down
     @blast.push(Blast.new(@window, direct, @x*3, @y*3, WIDTH))
     @bullets -= 1
     @isViolent = true
