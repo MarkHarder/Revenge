@@ -20,6 +20,8 @@ class Blast < Rectangle
   ##
   # The animation time for an explosion
   EXPLOSION_TIME = 240
+
+  @@sprites = nil
   
   ##
   # Create a new blast 
@@ -27,7 +29,7 @@ class Blast < Rectangle
     super(x, y, WIDTH, HEIGHT)
     @window = window
     @direction = direction
-    @sprites = Gosu::Image::load_tiles(@window, 'media/blast.png', WIDTH, HEIGHT, true)
+    @@sprites ||= Gosu::Image::load_tiles(@window, 'media/blast.png', WIDTH, HEIGHT, true)
     
     if direction == :left
       @x = x-offset
@@ -111,20 +113,20 @@ class Blast < Rectangle
     x_offset -= 470
     y_offset -= 330
     if @state == :initial
-      @image = @sprites[0]
+      @image = @@sprites[0]
       @state = :moving
     elsif @state == :moving
-        @image = @sprites[(Gosu::milliseconds / 60 % 4) + 1] if @direction == :right
-        @image = @sprites[(Gosu::milliseconds / 60 % 4) + 9] if @direction == :left
-        @image = @sprites[(Gosu::milliseconds / 60 % 4) + 17] if @direction == :down
+        @image = @@sprites[(Gosu::milliseconds / 60 % 4) + 1] if @direction == :right
+        @image = @@sprites[(Gosu::milliseconds / 60 % 4) + 9] if @direction == :left
+        @image = @@sprites[(Gosu::milliseconds / 60 % 4) + 17] if @direction == :down
     elsif @state == :collision
-      @image = @sprites[(Gosu::milliseconds / 120 % 3) + 5] if @direction == :right
-      @image = @sprites[(Gosu::milliseconds / 120 % 3) + 13] if @direction == :left
-      @image = @sprites[(Gosu::milliseconds / 120 % 3) + 21] if @direction == :down
+      @image = @@sprites[(Gosu::milliseconds / 120 % 3) + 5] if @direction == :right
+      @image = @@sprites[(Gosu::milliseconds / 120 % 3) + 13] if @direction == :left
+      @image = @@sprites[(Gosu::milliseconds / 120 % 3) + 21] if @direction == :down
     else
       #state == :finished
-      @image = @sprites[0] if @direction == :right
-      @image = @sprites[8] if @direction == :left
+      @image = @@sprites[0] if @direction == :right
+      @image = @@sprites[8] if @direction == :left
     end
     @image.draw(@x-x_offset, @y-y_offset, Z_LEVEL, size, size)
   end
