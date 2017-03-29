@@ -80,7 +80,7 @@ class Blast < Rectangle
       @window.level.platforms.each {|p| can_move = false if offset_rect.intersect?(p)}
       #check enemies for collision
       @window.level.enemies.each do |e|
-        if offset_rect.intersect?(e)
+        if offset_rect.intersect?(e) && !e.dead?
           can_move = false
           #Recognize Enemy Types
           if !e.invincible?
