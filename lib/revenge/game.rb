@@ -34,12 +34,7 @@ class Game < Gosu::Window
     self.caption = "Commander Keen in Revenge of the Shikadi!"
 
     @level = Level.new(self)
-
-    File.readlines("levels/level0.lvl").each do |line|
-      x, y = line.split(/\s/)
-      @player = Player.new(self, x.to_i, y.to_i)
-      break
-    end
+    @player = Player.new(self, @level.start_x, @level.start_y)
 
     @menu_options = [
       :Play,
@@ -161,12 +156,7 @@ class Game < Gosu::Window
   def restart_game
     @level = 0
     @level = Level.new(self)
-
-    File.readlines("levels/level0.lvl").each do |line|
-      x, y = line.split(/\s/)
-      @player = Player.new(self, x.to_i, y.to_i)
-      break
-    end
+    @player = Player.new(self, @level.start_x, @level.start_y)
 
     @menu_options = [
       :Play,
@@ -181,13 +171,9 @@ class Game < Gosu::Window
     @paused = false
   end
 
-  def load_level file_name
-    File.readlines(file_name).each do |line|
-      x, y = line.split(/\s/)
-      @player.start_level x.to_i, y.to_i
-      break
-    end
-    @level.load_level file_name
+  def load_level(file_name)
+    @level.load_level(file_name)
+    @player.start_level(@level.start_x, @level.start_y)
   end
 
   ##

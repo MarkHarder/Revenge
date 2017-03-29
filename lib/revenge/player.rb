@@ -54,11 +54,9 @@ class Player < Rectangle
 
   ##
   # Create a player
-  def initialize window, x, y
+  def initialize(window, x, y)
     super(x, y, WIDTH - 20, HEIGHT - 4)
 
-    @start_x = @x
-    @start_y = @y
     @direction = :right
     @hang_direction = :none
     @score = 0
@@ -84,13 +82,12 @@ class Player < Rectangle
     @isViolent = false
   end
 
-  def start_level x, y
+  def start_level(x, y)
     @x = x
     @y = y
-    @start_x = @x
-    @start_y = @y
     @direction = :right
     @hang_direction = :none
+
     @velocity = 1
 
     @action = :falling
@@ -533,11 +530,7 @@ class Player < Rectangle
   # place the player back in starting position
   # reset default values for variables
   def restart
-    @x = @start_x
-    @y = @start_y
-    @direction = :right
-    @hang_direction = :none
-    @action = :falling
+    start_level(@window.level.start_x, @window.level.start_y)
   end
 
   ##
@@ -603,4 +596,3 @@ class Player < Rectangle
     end
   end
 end
-

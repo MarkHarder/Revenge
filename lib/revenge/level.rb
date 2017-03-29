@@ -14,7 +14,7 @@ require_relative 'door.rb'
 # A basic level template
 
 class Level
-  attr_reader :platforms, :enemies, :candies, :door, :ledges
+  attr_reader :platforms, :enemies, :candies, :door, :ledges, :start_x, :start_y
   attr_accessor :level
 
   ##
@@ -38,13 +38,16 @@ class Level
   # Create a level.
   # Set up the enemies and the candies
   # Load information from the level file
-  def initialize window
+  def initialize(window)
     @terrain = Gosu::Image::load_tiles(window, "media/Terrain.png", TILE_WIDTH, TILE_HEIGHT * 2, true)
     @window = window
 
     @level = 0
 
-    load_level "levels/level0.lvl"
+    @start_x = 0
+    @start_y = 0
+
+    load_level("levels/level0.lvl")
   end
 
   ##
@@ -126,7 +129,7 @@ class Level
 
   ##
   # read in a level form a text file
-  def load_level file_name
+  def load_level(file_name)
     @enemies = []
     @candies = []
     @tiles = []
@@ -136,7 +139,11 @@ class Level
     # - = platform
     line_no = 0
     File.readlines(file_name).each do |line|
-      if line_no == 1
+      if line_no == 0
+        x, y = line.split(/\s/)
+        @start_x = x.to_i
+        @start_y = y.to_i
+      elsif line_no == 1
         x, y = line.split(/\s/)
         @door = Door.new(@window, x.to_i, y.to_i)
       elsif line_no == 2
